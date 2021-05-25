@@ -1,6 +1,9 @@
 import React, {useState, useEffect} from 'react'
-//import {Modal} from 'antd'
 import {Modal} from 'antd'
+import Footer from '../components/Footer';
+import Menu from '../components/Menu';
+import Nav from '../components/Nav';
+
 
 const Usuarios = () => {
 
@@ -31,7 +34,7 @@ const Usuarios = () => {
             }),
         })
         .then(response => response.json())
-        .then(data => setDatos(data));   
+        .then(data => data === 'usuario no encontrado verifica datos' ? '' : setDatos(data));   
     }, []);
     console.log(datos)
 
@@ -49,7 +52,8 @@ const Usuarios = () => {
         }),
         })
         .then(response => response.json())
-        .then(data => data === 'usuario no encontrado verifica datos' ? '' : setDatos(data))
+        .then(data => data === 'usuario no encontrado verifica datos' ? '' : setDatos(data)
+        );
     }
 
     const Nuevo = () => {
@@ -177,7 +181,7 @@ const Usuarios = () => {
     }
 
     return (
-        <>
+        <div className="wrapper">
             <Modal
                 title="Crear Usuario"
                 visible={modal}
@@ -188,7 +192,7 @@ const Usuarios = () => {
                 <form id="form" onSubmit="" className="form-group">
                     <div className="row form-group">
                         <label htmlFor="nombre" className="col-md-3 col-form-label">Nombre</label>
-                        <div class="col-md-9"><input
+                        <div className="col-md-9"><input
                             onChange={(e)=>{setUse_Nombre(e.target.value)}}
                             type="text"
                             name="use_nombre" 
@@ -197,7 +201,7 @@ const Usuarios = () => {
                     </div>
                     <div className="row form-group">
                         <label htmlFor="apellido" className="col-md-3 col-form-label">Apellido</label>
-                        <div class="col-md-9"><input
+                        <div className="col-md-9"><input
                            onChange={(e)=>{setUse_Apellido(e.target.value)}}
                             type="text"
                             name="use_apellido" 
@@ -207,7 +211,7 @@ const Usuarios = () => {
                     </div>
                     <div className="row form-group">
                         <label htmlFor="documento" className="col-md-3 col-form-label">Documento</label>
-                        <div class="col-md-9"><input
+                        <div className="col-md-9"><input
                             onChange={(e)=>{setUse_Documento(e.target.value)}}
                             type="text"
                             name="use_documento"
@@ -217,7 +221,7 @@ const Usuarios = () => {
                     </div>
                     <div className="row form-group">
                         <label htmlFor="correo" className="col-md-3 col-form-label">Correo</label>
-                        <div class="col-md-9"><input
+                        <div className="col-md-9"><input
                             onChange={(e)=>{setUse_correo(e.target.value)}}
                             type="email"
                             name="use_correo"
@@ -226,7 +230,7 @@ const Usuarios = () => {
                     </div>
                     <div className="row form-group">
                         <label htmlFor="contrasena" className="col-md-3 col-form-label">Contraseña</label>
-                        <div class="col-md-9"><input
+                        <div className="col-md-9"><input
                             onChange={(e)=>{setUse_contrasena(e.target.value)}}
                             type="password"
                             name="use_contrasena"
@@ -235,7 +239,7 @@ const Usuarios = () => {
                     </div>
                     <div className="row form-group">
                         <label htmlFor="conf_contrasena" className="col-md-3 col-form-label">Contraseña</label>
-                        <div class="col-md-9"><input
+                        <div className="col-md-9"><input
                             onChange={(e)=>{setConf_se_contrasena(e.target.value)}}
                             type="password"
                             name="conf_use_contrasena"
@@ -244,7 +248,7 @@ const Usuarios = () => {
                     </div>
                     <div className="row form-group">
                         <label htmlFor="tipo" className="col-md-3 col-form-label">Tipo de usuario</label>
-                        <div class="col-md-9">
+                        <div className="col-md-9">
                             <select onChange={(e)=>{setUse_tipo(e.target.value)}} name="use_tipo" className="ant-input" allowClear>
                                 <option>Escoge tu tipo de usuario</option>
                                 <option value="1">Administrador</option>
@@ -273,7 +277,7 @@ const Usuarios = () => {
                 <form id="form" onSubmit="" className="form-group">
                     <div className="row form-group">
                         <label htmlFor="nombre" className="col-md-3 col-form-label">Nombre</label>
-                        <div class="col-md-9"><input
+                        <div className="col-md-9"><input
                             onChange={(e)=>{setUse_Nombre(e.target.value)}}
                             value={use_nombre}
                             type="text"
@@ -283,7 +287,7 @@ const Usuarios = () => {
                     </div>
                     <div className="row form-group">
                         <label htmlFor="apellido" className="col-md-3 col-form-label">Apellido</label>
-                        <div class="col-md-9"><input
+                        <div className="col-md-9"><input
                            onChange={(e)=>{setUse_Apellido(e.target.value)}}
                            value={use_apellido}
                             type="text"
@@ -294,7 +298,7 @@ const Usuarios = () => {
                     </div>
                     <div className="row form-group">
                         <label htmlFor="documento" className="col-md-3 col-form-label">Documento</label>
-                        <div class="col-md-9"><input
+                        <div className="col-md-9"><input
                             onChange={(e)=>{setUse_Documento(e.target.value)}}
                             value={use_documento}
                             type="text"
@@ -305,7 +309,7 @@ const Usuarios = () => {
                     </div>
                     <div className="row form-group">
                         <label htmlFor="correo" className="col-md-3 col-form-label">Correo</label>
-                        <div class="col-md-9"><input
+                        <div className="col-md-9"><input
                             onChange={(e)=>{setUse_correo(e.target.value)}}
                             value={use_correo}
                             type="email"
@@ -315,7 +319,7 @@ const Usuarios = () => {
                     </div>
                     <div className="row form-group">
                         <label htmlFor="tipo"  className="col-md-3 col-form-label">Tipo de usuario</label>
-                        <div class="col-md-9">
+                        <div className="col-md-9">
                             <select value={use_tipo} onChange={(e)=>{setUse_tipo(e.target.value)}} name="use_tipo" className="ant-input" allowClear>
                                 <option>Escoge tu tipo de usuario</option>
                                 <option value="1">Administrador</option>
@@ -334,55 +338,74 @@ const Usuarios = () => {
                     }
                 </form>
             </Modal>
-            <div>
-                <table className="table table-striped table-bordered mt-3">
-                    <td><label htmlFor="nombre">Nombre: </label></td>
-                    <td><input onChange={(e)=>{setUse_Nombre(e.target.value)}} name="nombre" type="text"/></td>
-                    <td><label htmlFor="apellido">Apellido: </label></td>
-                    <td><input onChange={(e)=>{setUse_Apellido(e.target.value)}} name="apellido" type="text"/></td>
-                    <td><label htmlFor="documento">Documento: </label></td>
-                    <td><input onChange={(e)=>{setUse_Documento(e.target.value)}} name="documento" type="number"/></td>
-                    <td><button onClick={Buscar} className="btn btn-success">Buscar</button></td>
-                    <td><button onClick={Nuevo} className="btn btn-success">Nuevo</button></td>
-                </table>
-            </div>
-            <div className=" table-responsive" >
-                <table className="table table-striped table-bordered mt-5" id="table-usuarios">
-                <tbody>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Documento</th>
-                        <th>correo</th>
-                        <th>Tipo</th>
-                    </tr>
-                    {
-                        datos.map((item, index) => 
-                        <tr key={index}>
-                            <td>{item.use_nombre}</td>
-                            <td>{item.use_apellido}</td>
-                            <td>{item.use_documento}</td>
-                            <td>{item.use_correo}</td>
-                            <td>{item.use_tipo === 1 ? 'Administrador' : item.use_tipo === 2 ? 'Gestion Vehiculos' : 'Reparacion vehiculos'}</td>
-                            <td><button
-                                    className="btn btn-info"
-                                    onClick={() => {Editar(item.id)}}
-                                >
-                                    Editar
-                                </button></td>
-                            <td><button
-                                    className="btn btn-danger"
-                                    onClick={()=>{Eliminar(item.id)}}
-                                >
-                                    Eliminar
-                                </button></td>
+
+          <Nav></Nav>
+          <Menu></Menu>
+            <div className="content-wrapper">  
+                <section className="content">
+                    <div className="container-fluid">
+                        <div className="row">
+                                <div className="col-md-3">
+                                    <label htmlFor="nombre">Nombre: </label>
+                                    <input onChange={(e)=>{setUse_Nombre(e.target.value)}} name="nombre" type="text"  className="ant-input"/></div>
+                                <div className="col-md-3">
+                                    <label htmlFor="apellido">Apellido: </label>
+                                    <input onChange={(e)=>{setUse_Apellido(e.target.value)}} name="apellido" type="text" className="ant-input"/></div>
+                                <div className="col-md-3">
+                                    <label htmlFor="documento">Documento: </label>
+                                    <input onChange={(e)=>{setUse_Documento(e.target.value)}} name="documento" type="number" className="ant-input"/></div>
+                                <div className="col-md-1"><br/>
+                                    <button onClick={Buscar} className="btn btn-primary">Buscar</button>
+                                </div>
+                                <div className="col-md-1"><br/>
+                                    <button onClick={Nuevo} className="btn btn-success">Nuevo</button>
+                                </div>
+                        
+                        </div>
+                        <div className="row" >
+                    <div className="col-md-12"><table className="table table-striped table-bordered mt-5" id="table-usuarios">
+                    <tbody>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Documento</th>
+                            <th>correo</th>
+                            <th>Tipo</th>
                         </tr>
-                    )
-                    }
-                </tbody>
-                </table>
+                        {
+                            datos.map((item, index) => 
+                            <tr key={index}>
+                                <td>{item.use_nombre}</td>
+                                <td>{item.use_apellido}</td>
+                                <td>{item.use_documento}</td>
+                                <td>{item.use_correo}</td>
+                                <td>{item.use_tipo === 1 ? 'Administrador' : item.use_tipo === 2 ? 'Gestion Vehiculos' : 'Reparacion vehiculos'}</td>
+                                <td><button
+                                        className="btn btn-primary"
+                                        onClick={() => {Editar(item.id)}}
+                                    >
+                                        Editar
+                                    </button></td>
+                                <td><button
+                                        className="btn btn-danger"
+                                        onClick={()=>{Eliminar(item.id)}}
+                                    >
+                                        Eliminar
+                                    </button></td>
+                            </tr>
+                        )
+                        }
+                    </tbody>
+                    </table>
+                    </div>
+                    
+                </div>
+                    </div>
+                </section>
             </div>
-        </>
+            <Footer></Footer>
+
+        </div>
     )
 };
 
