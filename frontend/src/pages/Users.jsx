@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {Modal} from 'antd'
+import {Modal, Table} from 'antd'
 import Footer from '../components/Footer';
 import Menu from '../components/Menu';
 import Nav from '../components/Nav';
@@ -7,8 +7,9 @@ import Nav from '../components/Nav';
 
 const Usuarios = () => {
 
-    const [datos, setDatos] = useState([{}])
-    const [use_id, setId] = useState(0)
+    const [datos, setDatos] = useState([])
+    const [perfiles, setPerfiles] = useState([{}])
+    const [use_id, setId] = useState(null)
     const [use_nombre, setUse_Nombre] = useState('')
     const [use_apellido, setUse_Apellido] = useState('')
     const [use_documento, setUse_Documento] = useState('')
@@ -19,8 +20,43 @@ const Usuarios = () => {
     const [modal, setModal] = useState(false)
     const [modalEdid, setModalEdid] = useState(false)
     const [error, setError] = useState(null)
+    const columns = [
+        {
+          title: 'Nombre',
+          dataIndex: 'nombre',
+          sorter: (a, b) => a.nombre.length - b.nombre.length,
+          sortDirections: ['descend'],
+        },
+        {
+          title: 'Apellido',
+          dataIndex: 'apellido',
+        },
+        {
+            title: 'Documento',
+            dataIndex: 'documento',
+        },
+        {
+            title: 'Correo',
+            dataIndex: 'correo',
+            
+        },
+        {
+            title: 'Tipo',
+            dataIndex: 'tipo',
+            
+        },
+        {
+            title: 'Editar',
+            dataIndex: 'editar',
+        },
+        {
+            title: 'Eliminar',
+            dataIndex: 'eliminar',
+            
+        }
+    ]
 
-    useEffect(() => {
+    useEffect(async() => {
         
             fetch("/usuarios", {
                 method: "POST",
@@ -34,12 +70,39 @@ const Usuarios = () => {
             }),
         })
         .then(response => response.json())
-        .then(data => data === 'usuario no encontrado verifica datos' ? '' : setDatos(data));   
+        .then(data => {
+            data.map(item =>
+                setDatos(datos => [...datos, {
+                    key: item.id, 
+                    nombre: item.use_nombre, 
+                    apellido: item.use_apellido,
+                    documento: item.use_documento, 
+                    correo: item.use_correo,
+                    tipo: item.use_tipo,
+                    editar: (<button
+                                onClick={() => {Editar(item.id)}}
+                                className="btn btn-primary"
+                            >
+                                Editar
+                            </button>),
+                    eliminar: (<button
+                                className="btn btn-danger"
+                                onClick={() => {Eliminar(item.id)}}
+                            >
+                                Eliminar
+                            </button>)
+                }])
+            )
+        });
+        
+        const res = await fetch(`/perfiles_actvos?` + new URLSearchParams({ estado: 1}))
+        const data = await res.json()
+        setPerfiles(data)
+
     }, []);
-    console.log(datos)
 
     const Buscar = () => {
-
+        Reset_user()
         fetch("/usuarios", {
             method: "POST",
             headers: {
@@ -52,8 +115,30 @@ const Usuarios = () => {
         }),
         })
         .then(response => response.json())
-        .then(data => data === 'usuario no encontrado verifica datos' ? '' : setDatos(data)
-        );
+        .then(data => {
+            data.map(item =>
+                setDatos(datos => [...datos, {
+                    key: item.id, 
+                    nombre: item.use_nombre, 
+                    apellido: item.use_apellido,
+                    documento: item.use_documento, 
+                    correo: item.use_correo,
+                    tipo: item.use_tipo,
+                    editar: (<button
+                                onClick={() => {Editar(item.id)}}
+                                className="btn btn-primary col-md-1"
+                            >
+                                Editar
+                            </button>),
+                    eliminar: (<button
+                                className="btn btn-danger col-md-1"
+                                onClick={() => {Eliminar(item.id)}}
+                            >
+                                Eliminar
+                            </button>)
+                }])
+            )
+        });
     }
 
     const Nuevo = () => {
@@ -98,6 +183,7 @@ const Usuarios = () => {
                 if (res.status === 200) {
                 setError(null)
                 CerrarModal()
+                window.location.href = '/users'
             } else {setError('Error en el servidor contacta al administrador')}
             });
         }
@@ -147,18 +233,15 @@ const Usuarios = () => {
             }),
             }).then((res) => {
                 if (res.status === 200) {
-                setError(null)
                 Reset_user()
                 CerrarModalEdid()
-                Buscar()
+                window.location.href = '/users'
             } else {setError('Error en el servidor contacta al administrador')}
             });
         }
     }
 
     const Eliminar = (id) => {
-        const nuevoArray = datos.filter(item => item.id !== id)
-        setDatos(nuevoArray)
 
         fetch('/eliminar_usuario' , {
             method: 'DELETE',
@@ -169,15 +252,18 @@ const Usuarios = () => {
            id: id
            })
        })
+       Buscar()
     }
 
     const Reset_user = () => {
+        setDatos([])
         setUse_Nombre('')
         setUse_Apellido('')
         setUse_Documento('')
         setUse_correo('')
         setUse_tipo('')
         setId('')
+        setError(null)
     }
 
     return (
@@ -250,10 +336,12 @@ const Usuarios = () => {
                         <label htmlFor="tipo" className="col-md-3 col-form-label">Tipo de usuario</label>
                         <div className="col-md-9">
                             <select onChange={(e)=>{setUse_tipo(e.target.value)}} name="use_tipo" className="ant-input" allowClear>
-                                <option>Escoge tu tipo de usuario</option>
-                                <option value="1">Administrador</option>
-                                <option value="2">Gestion vehiculos</option>
-                                <option value="3">Reparacion vehiculos</option>
+                                <option value="">----------------</option>
+                                {
+                                    perfiles.map(perfil =>
+                                        <option value={perfil.id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
+                                    )
+                                }
                             </select>
                         </div>       
                     </div>
@@ -321,10 +409,12 @@ const Usuarios = () => {
                         <label htmlFor="tipo"  className="col-md-3 col-form-label">Tipo de usuario</label>
                         <div className="col-md-9">
                             <select value={use_tipo} onChange={(e)=>{setUse_tipo(e.target.value)}} name="use_tipo" className="ant-input" allowClear>
-                                <option>Escoge tu tipo de usuario</option>
-                                <option value="1">Administrador</option>
-                                <option value="2">Gestion vehiculos</option>
-                                <option value="3">Reparacion vehiculos</option>
+                                <option value="">----------------</option>
+                                {
+                                    perfiles.map(perfil =>
+                                        <option value={perfil.id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
+                                    )
+                                }
                             </select>
                         </div>       
                     </div>
@@ -360,43 +450,15 @@ const Usuarios = () => {
                                 <div className="col-md-1"><br/>
                                     <button onClick={Nuevo} className="btn btn-success">Nuevo</button>
                                 </div>
-                        
                         </div>
                         <div className="row" >
-                    <div className="col-md-12"><table className="table table-striped table-bordered mt-5" id="table-usuarios">
-                    <tbody>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Apellido</th>
-                            <th>Documento</th>
-                            <th>correo</th>
-                            <th>Tipo</th>
-                        </tr>
-                        {
-                            datos.map((item, index) => 
-                            <tr key={index}>
-                                <td>{item.use_nombre}</td>
-                                <td>{item.use_apellido}</td>
-                                <td>{item.use_documento}</td>
-                                <td>{item.use_correo}</td>
-                                <td>{item.use_tipo === 1 ? 'Administrador' : item.use_tipo === 2 ? 'Gestion Vehiculos' : 'Reparacion vehiculos'}</td>
-                                <td><button
-                                        className="btn btn-primary"
-                                        onClick={() => {Editar(item.id)}}
-                                    >
-                                        Editar
-                                    </button></td>
-                                <td><button
-                                        className="btn btn-danger"
-                                        onClick={()=>{Eliminar(item.id)}}
-                                    >
-                                        Eliminar
-                                    </button></td>
-                            </tr>
-                        )
-                        }
-                    </tbody>
-                    </table>
+                    <div className="col-md-12">
+                        <Table 
+                            className="table table-striped table-bordered mt-5" 
+                            columns={columns} 
+                            dataSource={datos}
+                            
+                        />
                     </div>
                     
                 </div>

@@ -15,7 +15,7 @@ const Login = () => {
             setError('ingresa tu contraseña')
         } else {
             console.info("Entro");
-            const res = await fetch('/inicio_sesion?' + new URLSearchParams({ email: email, contrasena: pass }));
+            const res = await fetch('/inicio_sesion?' + new URLSearchParams({ use_correo: email, use_contrasena: pass }));
             console.log(res);
             const data = await res.json();
 

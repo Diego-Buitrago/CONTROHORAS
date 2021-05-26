@@ -5,11 +5,11 @@ const {pool} = require('../database/database')
 router.get('/inicio_sesion', async (req, res) => {
     console.log("Entro por aca");
     let client = await pool.connect();
-    const { email, contrasena} = req.query;
+    const { use_correo, use_contrasena} = req.query;
     
     try {
         let result = await client.query(
-          `SELECT * FROM usuarios WHERE email = $1 and contrasena = $2`, [email, contrasena]
+          `SELECT * FROM usuarios WHERE use_correo = $1 and use_contrasena = $2`, [use_correo, use_contrasena]
         );
         if (result.rowCount == 0) {
           return res.json('usuario no encontrado verifica datos');
@@ -167,6 +167,138 @@ router.put('/editar_usuario', async(req, res) => {
   } finally {
       client.release(true);
   }
+});
+
+router.post('/perfiles', async (req, res) => {
+  let client = await pool.connect();
+  const {per_nombre, per_estado} = req.body
+  
+  try {
+      let result = await client.query(
+        `SELECT id, per_nombre, per_estado FROM perfiles WHERE (per_nombre ILIKE REPLACE 
+        ('%${per_nombre}%', ' ', '%') OR '${per_nombre}' IS NULL OR '${per_nombre}' = '')`
+      );
+      if (result.rowCount == 0) {
+        return res.json('usuario no encontrado verifica datos');
+      } else {
+          return res.json(result.rows);
+      }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    client.release(true);
+  }
+});
+
+router.get('/get_perfil', async(req, res) => {
+  let client = await pool.connect();
+  const { id } = req.query;
+    
+    try {
+        let result = await client.query(
+          `SELECT * FROM perfiles WHERE id = $1 `, [id]
+        );
+        if (result.rowCount == 0) {
+          return res.json('usuario no encontrado verifica datos');
+        } else {
+            return res.json(result.rows);
+        }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      client.release(true);
+    }
+});
+
+router.get('/perfiles_actvos', async(req, res) => {
+  let client = await pool.connect();
+  const { estado } = req.query;
+    
+    try {
+        let result = await client.query(
+          `SELECT * FROM perfiles WHERE per_estado = $1 `, [estado]
+        );
+        if (result.rowCount == 0) {
+          return res.json('usuario no encontrado verifica datos');
+        } else {
+            return res.json(result.rows);
+        }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      client.release(true);
+    }
+});
+
+router.put('/editar_perfil', async(req, res) => {
+  let client = await pool.connect();
+  try {
+      const {
+          per_nombre,
+          per_estado,
+          per_id
+      } = req.body
+      const client = await pool.connect()
+      const response = await client.query(
+          'UPDATE perfiles SET per_nombre = $1, per_estado = $2 WHERE id = $3',
+          [per_nombre, per_estado, per_id])
+          return res.json('OK');
+     
+  } catch (e) {
+      console.log(e)
+      res.status(500).json({errorCode : e.errno, message : "Error en el servidor"});
+  } finally {
+      client.release(true);
+  }
+});
+
+router.post('/registrar_perfil', async(req, res) => {
+  let client = await pool.connect();
+    try {
+        const {
+            per_nombre,
+            per_estado,
+        } = req.body
+        const client = await pool.connect()
+        const response = await client.query(
+            'INSERT INTO perfiles(per_nombre, per_estado) VALUES($1, $2) RETURNING id',
+            [per_nombre, per_estado])
+
+        if (response.rowsCount > 0) {
+            res.json({
+                id: response.rows[0].id,
+                per_nombre: per_nombre,
+                per_estado: per_estado
+            })
+        } else {
+            res.json({});
+        }
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({errorCode : e.errno, message : "Error en el servidor"});
+    } finally {
+        client.release(true);
+    }
+});
+
+router.delete('/eliminar_perfil', async(req, res) => {
+  const {id} = req.body
+  let client = await pool.connect();
+
+  try {
+    let result = await client.query(
+      `DELETE FROM perfiles WHERE id = $1`, [id]
+    );
+    if (result.rowCount == 0) {
+      return res.json('perfil no encontrado');
+    } else {
+        return res.json(result.rows);
+    }
+} catch (error) {
+  console.log(error);
+} finally {
+  client.release(true);
+}
 });
 
 router.post('/registrar_vehiculo', async(req, res) => {
@@ -563,7 +695,5 @@ router.get('/info_tipo_seguimiento', async (req, res) => {
     client.release(true);
   }
 });
-
-
 
 module.exports = router

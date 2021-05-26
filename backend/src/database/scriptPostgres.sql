@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS usuarios;
 DROP TABLE IF EXISTS motocicletas;
 DROP TABLE IF EXISTS seguimiento;
 DROP TABLE IF EXISTS veihiculos_eliminados;
+DROP TABLE IF EXISTS perfiles;
 
 CREATE TABLE usuarios(
     id SERIAL PRIMARY KEY,
@@ -18,6 +19,12 @@ CREATE TABLE usuarios(
     use_correo VARCHAR(50) NOT NULL UNIQUE,
     use_contrasena VARCHAR(50) NOT NULL,
     use_tipo INTEGER NOT NULL
+);
+
+CREATE TABLE perfiles(
+    id SERIAL PRIMARY KEY,
+    per_nombre VARCHAR(50) NOT NULL,
+    per_estado INTEGER NOT NULL
 );
 
 CREATE TABLE motocicletas(
