@@ -1,247 +1,256 @@
-import React, {useState, useEffect} from 'react'
+import React, {Component} from 'react'
 import {Modal, Table} from 'antd'
 import Footer from '../components/Footer';
 import Menu from '../components/Menu';
 import Nav from '../components/Nav';
+import SimpleReactValidator from 'simple-react-validator'
+SimpleReactValidator.addLocale('custom', {
+    accepted: 'Hab SoSlI’ Quch!',
+    email: 'Ingresar un correo valido. Ejemplo: example@ex.com',
+    required: 'El campo :attribute es obligatorio.',
+    max: ':attribute no debe ser mayor a :max:type.',
+    min: 'El tamaño de :attribute debe ser de al menos :min:type.',
+    alpha: ':attribute sólo debe contener letras.'
+});
 
 
-const Usuarios = () => {
+class Usuarios extends Component {
 
-    const [datos, setDatos] = useState([])
-    const [perfiles, setPerfiles] = useState([{}])
-    const [use_id, setId] = useState(null)
-    const [use_nombre, setUse_Nombre] = useState('')
-    const [use_apellido, setUse_Apellido] = useState('')
-    const [use_documento, setUse_Documento] = useState('')
-    const [use_correo, setUse_correo] = useState('')
-    const [use_contrasena, setUse_contrasena] = useState('')
-    const [conf_use_contrasena, setConf_se_contrasena] = useState('')
-    const [use_tipo, setUse_tipo] = useState('')
-    const [modal, setModal] = useState(false)
-    const [modalEdid, setModalEdid] = useState(false)
-    const [error, setError] = useState(null)
-    const columns = [
-        {
-          title: 'Nombre',
-          dataIndex: 'nombre',
-          sorter: (a, b) => a.nombre.length - b.nombre.length,
-          sortDirections: ['descend'],
-        },
-        {
-          title: 'Apellido',
-          dataIndex: 'apellido',
-        },
-        {
-            title: 'Documento',
-            dataIndex: 'documento',
-        },
-        {
-            title: 'Correo',
-            dataIndex: 'correo',
-            
-        },
-        {
-            title: 'Tipo',
-            dataIndex: 'tipo',
-            
-        },
-        {
-            title: 'Editar',
-            dataIndex: 'editar',
-        },
-        {
-            title: 'Eliminar',
-            dataIndex: 'eliminar',
-            
-        }
-    ]
+  
+    validator = new SimpleReactValidator({ locale:'custom'});
+    validatorEdi = new SimpleReactValidator({ locale:'custom'});
 
-    useEffect(async() => {
-        
-            fetch("/usuarios", {
-                method: "POST",
-                headers: {
-                "Content-Type": "application/json",
+    state = {
+        datos: [],
+        perfiles: [],
+        use_id: null,
+        use_nombre: '',
+        use_apellido: '',
+        use_documento: '',
+        use_correo: '',
+        use_contrasena: '',
+        conf_use_contrasena: '',
+        use_tipo: '',
+        per_nombre: '',
+        modal: false,
+        modalEdid: false,
+        error: null,
+        columns: [
+            {
+              title: 'Nombre',
+              dataIndex: 'nombre',
+              sorter: (a, b) => a.nombre.length - b.nombre.length,
+              sortDirections: ['descend'],
             },
-            body: JSON.stringify({
-                use_nombre: use_nombre,
-                use_apellido: use_apellido,
-                use_documento: use_documento
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            data.map(item =>
-                setDatos(datos => [...datos, {
-                    key: item.id, 
-                    nombre: item.use_nombre, 
-                    apellido: item.use_apellido,
-                    documento: item.use_documento, 
-                    correo: item.use_correo,
-                    tipo: item.use_tipo,
-                    editar: (<button
-                                onClick={() => {Editar(item.id)}}
-                                className="btn btn-primary"
-                            >
-                                Editar
-                            </button>),
-                    eliminar: (<button
-                                className="btn btn-danger"
-                                onClick={() => {Eliminar(item.id)}}
-                            >
-                                Eliminar
-                            </button>)
-                }])
-            )
-        });
-        
-        const res = await fetch(`/perfiles_actvos?` + new URLSearchParams({ estado: 1}))
-        const data = await res.json()
-        setPerfiles(data)
+            {
+              title: 'Apellido',
+              dataIndex: 'apellido',
+            },
+            {
+                title: 'Documento',
+                dataIndex: 'documento',
+            },
+            {
+                title: 'Correo',
+                dataIndex: 'correo',
+                
+            },
+            {
+                title: 'Tipo',
+                dataIndex: 'perfil',
+                
+            },
+            {
+                title: 'Editar',
+                dataIndex: 'editar',
+            },
+            {
+                title: 'Eliminar',
+                dataIndex: 'eliminar',
+            }
+        ]
+    }
 
-    }, []);
-
-    const Buscar = () => {
-        Reset_user()
+    async componentDidMount() {
         fetch("/usuarios", {
             method: "POST",
             headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            use_nombre: use_nombre,
-            use_apellido: use_apellido,
-            use_documento: use_documento
+            use_nombre: this.state.use_nombre,
+            use_apellido: this.state.use_apellido,
+            use_documento: this.state.use_documento
         }),
         })
         .then(response => response.json())
         .then(data => {
+            const array = []
             data.map(item =>
-                setDatos(datos => [...datos, {
+                array.push({
                     key: item.id, 
                     nombre: item.use_nombre, 
                     apellido: item.use_apellido,
                     documento: item.use_documento, 
                     correo: item.use_correo,
                     tipo: item.use_tipo,
+                    perfil: item.per_nombre,
                     editar: (<button
-                                onClick={() => {Editar(item.id)}}
-                                className="btn btn-primary col-md-1"
-                            >
-                                Editar
-                            </button>),
+                            onClick={() => {this.Editar(item.id)}}
+                            className="btn btn-primary"
+                        >
+                            Editar
+                        </button>),
                     eliminar: (<button
-                                className="btn btn-danger col-md-1"
-                                onClick={() => {Eliminar(item.id)}}
-                            >
-                                Eliminar
-                            </button>)
-                }])
+                            className="btn btn-danger"
+                            onClick={() => {this.Eliminar(item.id)}}
+                        >
+                            Eliminar
+                        </button>)
+                })
             )
+            this.setState({datos: array})
+        });
+    
+        const res = await fetch(`/perfiles_actvos?` + new URLSearchParams({ estado: 1}))
+        const data = await res.json()
+        this.setState({perfiles :data})
+    }
+
+    Buscar = () => {
+        this.Reset_user()
+        fetch("/usuarios", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            use_nombre: this.state.use_nombre,
+            use_apellido: this.state.use_apellido,
+            use_documento: this.state.use_documento
+        }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            const array = []
+            data.map(item =>
+                array.push({
+                    key: item.id, 
+                    nombre: item.use_nombre, 
+                    apellido: item.use_apellido,
+                    documento: item.use_documento, 
+                    correo: item.use_correo,
+                    tipo: item.use_tipo,
+                    perfil: item.per_nombre,
+                    editar: (<button
+                            onClick={() => {this.Editar(item.id)}}
+                            className="btn btn-primary"
+                        >
+                            Editar
+                        </button>),
+                    eliminar: (<button
+                            className="btn btn-danger"
+                            onClick={() => {this.Eliminar(item.id)}}
+                        >
+                            Eliminar
+                        </button>)
+                })
+            )
+            this.setState({datos: array})
         });
     }
 
-    const Nuevo = () => {
-        setModal(true)
+    Nuevo = () => {
+        this.setState({modal: true})
     }
 
-    const CerrarModal = () => {
-        setModal(false)
+    CerrarModal = () => {
+        this.setState({modal: false})
     }
 
-    const Accion = () => {
-
-        if (use_nombre === '') {
-            setError('Ingresa un nombre')
-        } else if (use_apellido === '') {
-            setError('Ingresa un apellido')
-        } else if (use_documento === '') {
-            setError('Ingresa una documento')
-        } else if (use_correo == '') {
-            setError('Ingresa un correo')
-        } else if (use_contrasena === '') {
-            setError('Ingresa una contraseña')
-        } else if (use_contrasena !== conf_use_contrasena) {
-            setError('La contraseña no coincide')
-        } else if (use_tipo === '') {
-            setError('Selecciona el tipo de usuario')
+    Accion = () => {
+        if (this.validator.allValid()) {
+            
+                fetch("/registrar_usuario", {
+                    method: "POST",
+                    headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    use_nombre: this.state.use_nombre,
+                    use_apellido: this.state.use_apellido,
+                    use_documento: this.state.use_documento,
+                    use_correo: this.state.use_correo,
+                    use_contrasena: this.state.use_contrasena,
+                    use_tipo: this.state.use_tipo
+                }),
+                }).then((res) => {
+                    if (res.status === 200) {
+                    this.CerrarModal()
+                    window.location.href = '/users'
+                } else {this.state({error: 'Error en el servidor contacta al administrador'})}
+                });
+            
         } else {
-            fetch("/registrar_usuario", {
-                method: "POST",
-                headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                use_nombre: use_nombre,
-                use_apellido: use_apellido,
-                use_documento: use_documento,
-                use_correo: use_correo,
-                use_contrasena: use_contrasena,
-                use_tipo: use_tipo
-            }),
-            }).then((res) => {
-                if (res.status === 200) {
-                setError(null)
-                CerrarModal()
-                window.location.href = '/users'
-            } else {setError('Error en el servidor contacta al administrador')}
-            });
+           
+            this.validator.showMessages();
+            this.forceUpdate();
         }
+           
     }
 
-    const Editar = async(id) => {
-        setModalEdid(true)
+    Editar = async(id) => {
+        this.setState({modalEdid: true})
+
         const res = await fetch(`/get_editar?` + new URLSearchParams({ id: id}))
         const data = await res.json()
-        setUse_Nombre(data[0].use_nombre)
-        setUse_Apellido(data[0].use_apellido)
-        setUse_Documento(data[0].use_documento)
-        setUse_correo(data[0].use_correo)
-        setUse_tipo(data[0].use_tipo)
-        setId(id)
+
+        this.setState({
+            use_nombre: data[0].use_nombre,
+            use_apellido: data[0].use_apellido,
+            use_documento: data[0].use_documento,
+            use_correo: data[0].use_correo,
+            use_tipo: data[0].use_tipo,           
+            use_id: id
+        })
     }
 
-    const CerrarModalEdid = () => {
-        setModalEdid(false)
+    CerrarModalEdid = () => {
+        this.setState({modalEdid: false})
     }
 
-    const AccionEdid = () => {
-        if (use_nombre === '') {
-            setError('Ingresa un nombre')
-        } else if (use_apellido === '') {
-            setError('Ingresa un apellido')
-        } else if (use_documento === '') {
-            setError('Ingresa una documento')
-        } else if (use_correo == '') {
-            setError('Ingresa un correo')
-        } else if (use_tipo === '') {
-            setError('Selecciona el tipo de usuario')
-        } else {
+    AccionEdid = () => {
+        if (this.validatorEdi.allValid()) {
             fetch("/editar_usuario", {
                 method: "PUT",
                 headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                use_nombre: use_nombre,
-                use_apellido: use_apellido,
-                use_documento: use_documento,
-                use_correo: use_correo,
-                use_contrasena: use_contrasena,
-                use_tipo: use_tipo,
-                use_id: use_id
+                use_nombre: this.state.use_nombre,
+                use_apellido: this.state.use_apellido,
+                use_documento: this.state.use_documento,
+                use_correo: this.state.use_correo,
+                use_contrasena: this.state.use_contrasena,
+                use_tipo: this.state.use_tipo,
+                use_id: this.state.use_id
             }),
             }).then((res) => {
                 if (res.status === 200) {
-                Reset_user()
-                CerrarModalEdid()
-                window.location.href = '/users'
-            } else {setError('Error en el servidor contacta al administrador')}
+                    this.Reset_user()
+                    this.CerrarModalEdid()
+                    window.location.href = '/users'
+                } else {this.setState({error: 'Error en el servidor contacta al administrador'})}
             });
+        } else {
+            console.log(this.state);
+            console.log("Error de validaco");
+            this.validatorEdi.showMessages();
+            this.forceUpdate();
         }
     }
 
-    const Eliminar = (id) => {
+    Eliminar = (id) => {
 
         fetch('/eliminar_usuario' , {
             method: 'DELETE',
@@ -252,102 +261,122 @@ const Usuarios = () => {
            id: id
            })
        })
-       Buscar()
+       window.location.href = '/users'
     }
 
-    const Reset_user = () => {
-        setDatos([])
-        setUse_Nombre('')
-        setUse_Apellido('')
-        setUse_Documento('')
-        setUse_correo('')
-        setUse_tipo('')
-        setId('')
-        setError(null)
+    Reset_user = () => {
+        this.setState({
+            datos: [],
+            use_nombre: '',
+            use_apellido: '',
+            use_documento: '',
+            use_correo: '',
+            use_tipo: '',
+            use_id: null,
+            error: null
+        })
     }
 
-    return (
-        <div className="wrapper">
+    onChange(e){
+        this.setState({
+            [e.target.name]: e.target.value
+        })
+    } 
+
+    render () {
+        return (
+            <div className="wrapper">
             <Modal
                 title="Crear Usuario"
-                visible={modal}
-                onOk={Accion}
-                onCancel={CerrarModal}
+                visible={this.state.modal}
+                onOk={this.Accion}
+                onCancel={this.CerrarModal}
                 centered
             >
                 <form id="form" onSubmit="" className="form-group">
                     <div className="row form-group">
-                        <label htmlFor="nombre" className="col-md-3 col-form-label">Nombre</label>
+                        <label htmlFor="use_nombre" className="col-md-3 col-form-label">Nombre</label>
                         <div className="col-md-9"><input
-                            onChange={(e)=>{setUse_Nombre(e.target.value)}}
+                            onChange={this.onChange.bind(this)}
                             type="text"
                             name="use_nombre" 
                             className="ant-input"
-                        /></div>
+                        />
+                        {this.validator.message('nombre', this.state.use_nombre, 'required|alpha|min:4', { className: 'text-danger' })}
+                        </div>
                     </div>
                     <div className="row form-group">
-                        <label htmlFor="apellido" className="col-md-3 col-form-label">Apellido</label>
+                        <label htmlFor="use_apellido" className="col-md-3 col-form-label">Apellido</label>
                         <div className="col-md-9"><input
-                           onChange={(e)=>{setUse_Apellido(e.target.value)}}
+                           onChange={this.onChange.bind(this)}
                             type="text"
                             name="use_apellido" 
                             className="ant-input"
                         />
+                        {this.validator.message('apellido', this.state.use_apellido, 'required|alpha|min:4', { className: 'text-danger' })}
                         </div>       
                     </div>
                     <div className="row form-group">
-                        <label htmlFor="documento" className="col-md-3 col-form-label">Documento</label>
+                        <label htmlFor="use_documento" className="col-md-3 col-form-label">Documento</label>
                         <div className="col-md-9"><input
-                            onChange={(e)=>{setUse_Documento(e.target.value)}}
+                            onChange={this.onChange.bind(this)}
                             type="text"
                             name="use_documento"
                             className="ant-input"
                         />
+                        {this.validator.message('documento', this.state.use_documento, 'required|min:6|max:10', { className: 'text-danger' })}
                         </div>       
                     </div>
                     <div className="row form-group">
-                        <label htmlFor="correo" className="col-md-3 col-form-label">Correo</label>
+                        <label htmlFor="use_correo" className="col-md-3 col-form-label">Correo</label>
                         <div className="col-md-9"><input
-                            onChange={(e)=>{setUse_correo(e.target.value)}}
+                           onChange={this.onChange.bind(this)}
                             type="email"
                             name="use_correo"
                             className="ant-input"
-                        /></div>       
+                        />
+                        {this.validator.message('correo', this.state.use_correo, 'required|email', { className: 'text-danger' })}
+                        </div>       
                     </div>
                     <div className="row form-group">
-                        <label htmlFor="contrasena" className="col-md-3 col-form-label">Contraseña</label>
+                        <label htmlFor="use_contrasena" className="col-md-3 col-form-label">Contraseña</label>
                         <div className="col-md-9"><input
-                            onChange={(e)=>{setUse_contrasena(e.target.value)}}
+                           onChange={this.onChange.bind(this)}
                             type="password"
                             name="use_contrasena"
                             className="ant-input"
-                        /></div>       
+                        />
+                        {this.validator.message('contraseña', this.state.use_contrasena, 'required|min:8|max:10|in:' + this.state.conf_use_contrasena +'|', { className: 'text-danger' })}
+                        </div>       
                     </div>
                     <div className="row form-group">
-                        <label htmlFor="conf_contrasena" className="col-md-3 col-form-label">Contraseña</label>
+                        <label htmlFor="conf_contrasena" className="col-md-3 col-form-label">Confirmar Contraseña</label>
                         <div className="col-md-9"><input
-                            onChange={(e)=>{setConf_se_contrasena(e.target.value)}}
+                            onChange={this.onChange.bind(this)}
                             type="password"
                             name="conf_use_contrasena"
                             className="ant-input"
-                        /></div>       
+                        />
+                        {this.validator.message('confirmar contraseña', this.state.conf_use_contrasena, 'required|min:8|max:10', { className: 'text-danger' })}
+                        </div>       
                     </div>
                     <div className="row form-group">
                         <label htmlFor="tipo" className="col-md-3 col-form-label">Tipo de usuario</label>
                         <div className="col-md-9">
-                            <select onChange={(e)=>{setUse_tipo(e.target.value)}} name="use_tipo" className="ant-input" allowClear>
+                            <select onChange={this.onChange.bind(this)} name="use_tipo" className="ant-input" allowClear>
                                 <option value="">----------------</option>
                                 {
-                                    perfiles.map(perfil =>
+                                    this.state.perfiles.map(perfil =>
                                         <option value={perfil.id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
                                     )
                                 }
                             </select>
+                            {this.validator.message('tipo usuario', this.state.use_tipo, 'required', { className: 'text-danger' })}
                         </div>       
                     </div>
                     {
-                        error != null ? (
-                            <div id="error" className="alert alert-danger mt-2">{error}</div>
+                        this.state.error != null ? (
+                            <div id="error" className="alert alert-danger mt-2">{this.state.error}</div>
                         ):
                         (
                             <div></div>
@@ -357,70 +386,77 @@ const Usuarios = () => {
             </Modal>
             <Modal
                 title="Editar Usuario"
-                visible={modalEdid}
-                onOk={AccionEdid}
-                onCancel={CerrarModalEdid}
+                visible={this.state.modalEdid}
+                onOk={this.AccionEdid.bind(this)}
+                onCancel={this.CerrarModalEdid}
                 centered
             >
                 <form id="form" onSubmit="" className="form-group">
                     <div className="row form-group">
-                        <label htmlFor="nombre" className="col-md-3 col-form-label">Nombre</label>
+                        <label htmlFor="use_nombre" className="col-md-3 col-form-label">Nombre</label>
                         <div className="col-md-9"><input
-                            onChange={(e)=>{setUse_Nombre(e.target.value)}}
-                            value={use_nombre}
+                            onChange={this.onChange.bind(this)}
+                            value={this.state.use_nombre}
                             type="text"
                             name="use_nombre" 
                             className="ant-input"
-                        /></div>
+                        />
+                         {this.validatorEdi.message('nombre', this.state.use_nombre, 'required|alpha|min:4', { className: 'text-danger' })}
+                        </div>
                     </div>
                     <div className="row form-group">
-                        <label htmlFor="apellido" className="col-md-3 col-form-label">Apellido</label>
+                        <label htmlFor="use_apellido" className="col-md-3 col-form-label">Apellido</label>
                         <div className="col-md-9"><input
-                           onChange={(e)=>{setUse_Apellido(e.target.value)}}
-                           value={use_apellido}
+                           onChange={this.onChange.bind(this)}
+                           value={this.state.use_apellido}
                             type="text"
                             name="use_apellido" 
                             className="ant-input"
                         />
+                         {this.validator.message('apellido', this.state.use_apellido, 'required|alpha|min:4', { className: 'text-danger' })}
                         </div>       
                     </div>
                     <div className="row form-group">
-                        <label htmlFor="documento" className="col-md-3 col-form-label">Documento</label>
+                        <label htmlFor="use_documento" className="col-md-3 col-form-label">Documento</label>
                         <div className="col-md-9"><input
-                            onChange={(e)=>{setUse_Documento(e.target.value)}}
-                            value={use_documento}
+                            onChange={this.onChange.bind(this)}
+                            value={this.state.use_documento}
                             type="text"
                             name="use_documento"
                             className="ant-input"
                         />
+                        {this.validatorEdi.message('documento', this.state.use_documento, 'required|min:6|max:10', { className: 'text-danger' })}
                         </div>       
                     </div>
                     <div className="row form-group">
-                        <label htmlFor="correo" className="col-md-3 col-form-label">Correo</label>
+                        <label htmlFor="use_correo" className="col-md-3 col-form-label">Correo</label>
                         <div className="col-md-9"><input
-                            onChange={(e)=>{setUse_correo(e.target.value)}}
-                            value={use_correo}
+                            onChange={this.onChange.bind(this)}
+                            value={this.state.use_correo}
                             type="email"
                             name="use_correo"
                             className="ant-input"
-                        /></div>       
+                        />
+                        {this.validatorEdi.message('correo', this.state.use_correo, 'required|email', { className: 'text-danger' })}
+                        </div>       
                     </div>
                     <div className="row form-group">
                         <label htmlFor="tipo"  className="col-md-3 col-form-label">Tipo de usuario</label>
                         <div className="col-md-9">
-                            <select value={use_tipo} onChange={(e)=>{setUse_tipo(e.target.value)}} name="use_tipo" className="ant-input" allowClear>
+                            <select value={this.state.use_tipo} onChange={this.onChange.bind(this)} name="use_tipo" className="ant-input" allowClear>
                                 <option value="">----------------</option>
                                 {
-                                    perfiles.map(perfil =>
+                                    this.state.perfiles.map(perfil =>
                                         <option value={perfil.id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
                                     )
                                 }
                             </select>
+                            {this.validatorEdi.message('tipo usuario', this.state.use_tipo, 'required', { className: 'text-danger' })}
                         </div>       
                     </div>
                     {
-                        error != null ? (
-                            <div id="error" className="alert alert-danger mt-2">{error}</div>
+                        this.state.error != null ? (
+                            <div id="error" className="alert alert-danger mt-2">{this.state.error}</div>
                         ):
                         (
                             <div></div>
@@ -428,7 +464,6 @@ const Usuarios = () => {
                     }
                 </form>
             </Modal>
-
           <Nav></Nav>
           <Menu></Menu>
             <div className="content-wrapper">  
@@ -436,28 +471,27 @@ const Usuarios = () => {
                     <div className="container-fluid">
                         <div className="row">
                                 <div className="col-md-3">
-                                    <label htmlFor="nombre">Nombre: </label>
-                                    <input onChange={(e)=>{setUse_Nombre(e.target.value)}} name="nombre" type="text"  className="ant-input"/></div>
+                                    <label htmlFor="use_nombre">Nombre: </label>
+                                    <input onChange={this.onChange.bind(this)} name="use_nombre" type="text"  className="ant-input"/></div>
                                 <div className="col-md-3">
-                                    <label htmlFor="apellido">Apellido: </label>
-                                    <input onChange={(e)=>{setUse_Apellido(e.target.value)}} name="apellido" type="text" className="ant-input"/></div>
+                                    <label htmlFor="use_apellido">Apellido: </label>
+                                    <input onChange={this.onChange.bind(this)} name="use_apellido" type="text" className="ant-input"/></div>
                                 <div className="col-md-3">
-                                    <label htmlFor="documento">Documento: </label>
-                                    <input onChange={(e)=>{setUse_Documento(e.target.value)}} name="documento" type="number" className="ant-input"/></div>
+                                    <label htmlFor="use_documento">Documento: </label>
+                                    <input onChange={this.onChange.bind(this)} name="use_documento" type="number" className="ant-input"/></div>
                                 <div className="col-md-1"><br/>
-                                    <button onClick={Buscar} className="btn btn-primary">Buscar</button>
+                                    <button onClick={this.Buscar} className="btn btn-primary">Buscar</button>
                                 </div>
                                 <div className="col-md-1"><br/>
-                                    <button onClick={Nuevo} className="btn btn-success">Nuevo</button>
+                                    <button onClick={this.Nuevo} className="btn btn-success">Nuevo</button>
                                 </div>
                         </div>
                         <div className="row" >
                     <div className="col-md-12">
                         <Table 
                             className="table table-striped table-bordered mt-5" 
-                            columns={columns} 
-                            dataSource={datos}
-                            
+                            columns={this.state.columns} 
+                            dataSource={this.state.datos}
                         />
                     </div>
                     
@@ -468,7 +502,8 @@ const Usuarios = () => {
             <Footer></Footer>
 
         </div>
-    )
-};
+        )
+    }
+}
 
 export default Usuarios; 

@@ -49,7 +49,7 @@ router.post('/usuarios', async (req, res) => {
   
   try {
       let result = await client.query(
-        `SELECT id, use_nombre, use_apellido, use_correo, use_documento, use_tipo FROM usuarios WHERE 
+        `SELECT u.id, u.use_nombre, u.use_apellido, u.use_correo, u.use_documento,u.use_tipo,p.per_nombre FROM usuarios u join perfiles p on p.id=u.use_tipo WHERE 
         (use_nombre ILIKE REPLACE ('%${use_nombre}%', ' ', '%') OR '${use_nombre}' IS NULL OR 
         '${use_nombre}' = '' ) AND (use_apellido ILIKE REPLACE ('%${use_apellido}%', ' ', '%') OR '${use_apellido}'
         IS NULL OR '${use_apellido}' = '') AND (use_documento ILIKE REPLACE ('%${use_documento}%', ' ', '%') OR '${use_documento}' 
@@ -238,7 +238,6 @@ router.put('/editar_perfil', async(req, res) => {
           per_estado,
           per_id
       } = req.body
-      const client = await pool.connect()
       const response = await client.query(
           'UPDATE perfiles SET per_nombre = $1, per_estado = $2 WHERE id = $3',
           [per_nombre, per_estado, per_id])
@@ -259,7 +258,6 @@ router.post('/registrar_perfil', async(req, res) => {
             per_nombre,
             per_estado,
         } = req.body
-        const client = await pool.connect()
         const response = await client.query(
             'INSERT INTO perfiles(per_nombre, per_estado) VALUES($1, $2) RETURNING id',
             [per_nombre, per_estado])
@@ -312,7 +310,6 @@ router.post('/registrar_vehiculo', async(req, res) => {
         fecha_ven_seguro,
         fecha_ven_tecnomecanica
       } = req.body
-      const client = await pool.connect()
       const response = await client.query(
           'INSERT INTO motocicletas(nro_placa, marca, linea, modelo, fecha_ven_seguro, fecha_ven_tecnomecanica) VALUES($1, $2, $3, $4, $5, $6)',
           [nro_placa, marca, linea, modelo, fecha_ven_seguro, fecha_ven_tecnomecanica])
