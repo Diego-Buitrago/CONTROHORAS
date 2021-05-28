@@ -5,17 +5,25 @@ import Menu from '../components/Menu';
 import Nav from '../components/Nav';
 import SimpleReactValidator from 'simple-react-validator'
 SimpleReactValidator.addLocale('custom', {
+    /*  pass: {
+        message: 'La :attribute debe ser :values.',
+        rule: (val, params, validator) =>
+        {
+            return validator.helpers.textRegex(val, /^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,10}$/) && params.indexOf(val)==-1
+        },
+        messageReplace: (message, params) => message.replace(':values', this.helpers.toSentence(params)),  // optional
+        required: true
+    }, */
     accepted: 'Hab SoSlI’ Quch!',
     email: 'Ingresar un correo valido. Ejemplo: example@ex.com',
     required: 'El campo :attribute es obligatorio.',
     max: ':attribute no debe ser mayor a :max:type.',
     min: 'El tamaño de :attribute debe ser de al menos :min:type.',
     alpha: ':attribute sólo debe contener letras.'
+    
 });
 
-
 class Usuarios extends Component {
-
   
     validator = new SimpleReactValidator({ locale:'custom'});
     validatorEdi = new SimpleReactValidator({ locale:'custom'});
@@ -76,43 +84,44 @@ class Usuarios extends Component {
             method: "POST",
             headers: {
             "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            use_nombre: this.state.use_nombre,
-            use_apellido: this.state.use_apellido,
-            use_documento: this.state.use_documento
-        }),
+            },
+            body: JSON.stringify({
+                use_nombre: this.state.use_nombre,
+                use_apellido: this.state.use_apellido,
+                use_documento: this.state.use_documento
+            }),
         })
         .then(response => response.json())
         .then(data => {
-            const array = []
-            data.map(item =>
-                array.push({
-                    key: item.id, 
-                    nombre: item.use_nombre, 
-                    apellido: item.use_apellido,
-                    documento: item.use_documento, 
-                    correo: item.use_correo,
-                    tipo: item.use_tipo,
-                    perfil: item.per_nombre,
-                    editar: (<button
-                            onClick={() => {this.Editar(item.id)}}
-                            className="btn btn-primary"
-                        >
-                            Editar
-                        </button>),
-                    eliminar: (<button
-                            className="btn btn-danger"
-                            onClick={() => {this.Eliminar(item.id)}}
-                        >
-                            Eliminar
-                        </button>)
-                })
-            )
+           const array = []
+            if (data !== 'usuario no encontrado verifica datos') {
+                data.map(item =>
+                    array.push({
+                        key: item.id, 
+                        nombre: item.use_nombre, 
+                        apellido: item.use_apellido,
+                        documento: item.use_documento, 
+                        correo: item.use_correo,
+                        tipo: item.use_tipo,
+                        perfil: item.per_nombre,
+                        editar: (<button
+                                onClick={() => {this.Editar(item.id)}}
+                                className="btn btn-primary"
+                            >
+                                Editar
+                            </button>),
+                        eliminar: (<button
+                                className="btn btn-danger"
+                                onClick={() => {this.Eliminar(item.id)}}
+                            >
+                                Eliminar
+                            </button>)
+                    })
+                )
+            }
             this.setState({datos: array})
         });
-    
-        const res = await fetch(`/perfiles_actvos?` + new URLSearchParams({ estado: 1}))
+        const res = await fetch(`/perfiles_activos`)
         const data = await res.json()
         this.setState({perfiles :data})
     }
@@ -133,35 +142,39 @@ class Usuarios extends Component {
         .then(response => response.json())
         .then(data => {
             const array = []
-            data.map(item =>
-                array.push({
-                    key: item.id, 
-                    nombre: item.use_nombre, 
-                    apellido: item.use_apellido,
-                    documento: item.use_documento, 
-                    correo: item.use_correo,
-                    tipo: item.use_tipo,
-                    perfil: item.per_nombre,
-                    editar: (<button
-                            onClick={() => {this.Editar(item.id)}}
-                            className="btn btn-primary"
-                        >
-                            Editar
-                        </button>),
-                    eliminar: (<button
-                            className="btn btn-danger"
-                            onClick={() => {this.Eliminar(item.id)}}
-                        >
-                            Eliminar
-                        </button>)
-                })
-            )
-            this.setState({datos: array})
+            if (data !== 'usuario no encontrado verifica datos') {
+                data.map(item =>
+                    array.push({
+                        key: item.id, 
+                        nombre: item.use_nombre, 
+                        apellido: item.use_apellido,
+                        documento: item.use_documento, 
+                        correo: item.use_correo,
+                        tipo: item.use_tipo,
+                        perfil: item.per_nombre,
+                        editar: (<button
+                                onClick={() => {this.Editar(item.id)}}
+                                className="btn btn-primary"
+                            >
+                                Editar
+                            </button>),
+                        eliminar: (<button
+                                className="btn btn-danger"
+                                onClick={() => {this.Eliminar(item.id)}}
+                            >
+                                Eliminar
+                            </button>)
+                    })
+                )
+            }
+            this.setState({datos: array}) 
         });
     }
 
     Nuevo = () => {
         this.setState({modal: true})
+        this.Reset_user()
+        this.setState({use_tipo: this.state.perfiles[0].id})
     }
 
     CerrarModal = () => {
@@ -176,27 +189,32 @@ class Usuarios extends Component {
                     headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    use_nombre: this.state.use_nombre,
-                    use_apellido: this.state.use_apellido,
-                    use_documento: this.state.use_documento,
-                    use_correo: this.state.use_correo,
-                    use_contrasena: this.state.use_contrasena,
-                    use_tipo: this.state.use_tipo
+                    body: JSON.stringify({
+                        use_nombre: this.state.use_nombre,
+                        use_apellido: this.state.use_apellido,
+                        use_documento: this.state.use_documento,
+                        use_correo: this.state.use_correo,
+                        use_contrasena: this.state.use_contrasena,
+                        use_tipo: this.state.use_tipo
                 }),
                 }).then((res) => {
                     if (res.status === 200) {
-                    this.CerrarModal()
-                    window.location.href = '/users'
-                } else {this.state({error: 'Error en el servidor contacta al administrador'})}
+                        this.CerrarModal()
+                        window.location.href = '/users'
+                    } else if(res.status === 501) {
+                        this.setState({error: 'Error Correo ya registrado'})
+                    } else if (res.status === 502) {
+                        this.setState({error: 'Error documento ya registrado'})
+                    } else {
+                        this.setState({error: 'Error en el servidor contacta al administrador'})
+                    }
                 });
             
         } else {
            
             this.validator.showMessages();
             this.forceUpdate();
-        }
-           
+        }      
     }
 
     Editar = async(id) => {
@@ -226,25 +244,28 @@ class Usuarios extends Component {
                 headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                use_nombre: this.state.use_nombre,
-                use_apellido: this.state.use_apellido,
-                use_documento: this.state.use_documento,
-                use_correo: this.state.use_correo,
-                use_contrasena: this.state.use_contrasena,
-                use_tipo: this.state.use_tipo,
-                use_id: this.state.use_id
-            }),
+                body: JSON.stringify({
+                    use_nombre: this.state.use_nombre,
+                    use_apellido: this.state.use_apellido,
+                    use_documento: this.state.use_documento,
+                    use_correo: this.state.use_correo,
+                    use_contrasena: this.state.use_contrasena,
+                    use_tipo: this.state.use_tipo,
+                    use_id: this.state.use_id
+                }),
             }).then((res) => {
                 if (res.status === 200) {
-                    this.Reset_user()
-                    this.CerrarModalEdid()
+                    this.CerrarModal()
                     window.location.href = '/users'
-                } else {this.setState({error: 'Error en el servidor contacta al administrador'})}
+                } else if(res.status === 501) {
+                    this.setState({error: 'Error Correo ya registrado'})
+                } else if (res.status === 502) {
+                    this.setState({error: 'Error documento ya registrado'})
+                } else {
+                    this.setState({error: 'Error en el servidor contacta al administrador'})
+                }
             });
         } else {
-            console.log(this.state);
-            console.log("Error de validaco");
             this.validatorEdi.showMessages();
             this.forceUpdate();
         }
@@ -266,7 +287,6 @@ class Usuarios extends Component {
 
     Reset_user = () => {
         this.setState({
-            datos: [],
             use_nombre: '',
             use_apellido: '',
             use_documento: '',
@@ -346,8 +366,8 @@ class Usuarios extends Component {
                             name="use_contrasena"
                             className="ant-input"
                         />
-                        {this.validator.message('contraseña', this.state.use_contrasena, 'required|min:8|max:10|in:' + this.state.conf_use_contrasena +'|', { className: 'text-danger' })}
-                        </div>       
+                        {this.validator.message('contraseña', this.state.use_contrasena, 'required|min:8', { className: 'text-danger' })}
+                        </div>        
                     </div>
                     <div className="row form-group">
                         <label htmlFor="conf_contrasena" className="col-md-3 col-form-label">Confirmar Contraseña</label>
@@ -357,17 +377,16 @@ class Usuarios extends Component {
                             name="conf_use_contrasena"
                             className="ant-input"
                         />
-                        {this.validator.message('confirmar contraseña', this.state.conf_use_contrasena, 'required|min:8|max:10', { className: 'text-danger' })}
+                        {this.validator.message('confirmar contraseña', this.state.conf_use_contrasena, 'required|min:8|in:' + this.state.use_contrasena , { className: 'text-danger' })}
                         </div>       
                     </div>
                     <div className="row form-group">
-                        <label htmlFor="tipo" className="col-md-3 col-form-label">Tipo de usuario</label>
+                        <label htmlFor="use_tipo" className="col-md-3 col-form-label">Tipo de usuario</label>
                         <div className="col-md-9">
                             <select onChange={this.onChange.bind(this)} name="use_tipo" className="ant-input" allowClear>
-                                <option value="">----------------</option>
                                 {
                                     this.state.perfiles.map(perfil =>
-                                        <option value={perfil.id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
+                                        <option key={ perfil.id } value={perfil.id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
                                     )
                                 }
                             </select>
@@ -441,13 +460,13 @@ class Usuarios extends Component {
                         </div>       
                     </div>
                     <div className="row form-group">
-                        <label htmlFor="tipo"  className="col-md-3 col-form-label">Tipo de usuario</label>
+                        <label htmlFor="use_tipo"  className="col-md-3 col-form-label">Tipo de usuario</label>
                         <div className="col-md-9">
                             <select value={this.state.use_tipo} onChange={this.onChange.bind(this)} name="use_tipo" className="ant-input" allowClear>
                                 <option value="">----------------</option>
                                 {
                                     this.state.perfiles.map(perfil =>
-                                        <option value={perfil.id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
+                                        <option  key={perfil.id} value={perfil.id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
                                     )
                                 }
                             </select>

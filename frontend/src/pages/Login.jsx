@@ -1,10 +1,12 @@
 import React, {useState} from 'react';
+import useAuthContext from "../hooks/useAuthContext";
 
 const Login = () => {
 
     const [email, setEmail] = useState('')
     const [pass, setPass] = useState('')
     const [error, setError] = useState(null)
+    //const { Login } = useAuthContext();
     
     const LoginUsuario = async(e) => {
         e.preventDefault();
@@ -14,17 +16,16 @@ const Login = () => {
         } else if (pass === '') {
             setError('ingresa tu contraseña')
         } else {
-            console.info("Entro");
             const res = await fetch('/inicio_sesion?' + new URLSearchParams({ use_correo: email, use_contrasena: pass }));
-            console.log(res);
             const data = await res.json();
+            console.info(data.message)
 
-            if(data === 'usuario no encontrado verifica datos') {
-                setError('datos invalidos')
+            if(data.message === 'contraseña invalida') {
+                setError('Datos invalidos')
             } else if(data.length !== 0) {
-                console.log("dentro")
-                window.localStorage.setItem('tipo', data[0].tipo)
-                window.location.href = '/home'
+              //Login()
+              window.localStorage.setItem("authentication", true);
+              window.location.href = '/home'
             }
         }    
     }

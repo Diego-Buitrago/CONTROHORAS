@@ -12,7 +12,6 @@ SimpleReactValidator.addLocale('custom', {
 
 class Profiles extends Component {
 
-  
     validator = new SimpleReactValidator({ locale:'custom'});
 
     state = {
@@ -73,71 +72,35 @@ class Profiles extends Component {
         .then(response => response.json())
         .then(data => {
             const array = []
-            data.map(item =>
-                array.push({
-                    key: item.id, 
-                    nombre: item.per_nombre, 
-                    estado: (item.per_estado===1)?'Activo':'Inactivo',
-                    editar: (<button
-                                onClick={()=>{this.AbrirModal_editar(item.id)}}
-                                className="btn btn-primary"
-                            >
-                                Editar
-                            </button>),
-                    eliminar: (<button
-                                className="btn btn-danger"
-                                onClick={()=>{this.Eliminar(item.id)}}
-                            >
-                                Eliminar
-                            </button>)
-                })
-            )
-            console.info(array)
-            this.setState({datos: array})
-        });
-    }
-
-    Buscar = () => {
-        this.Reset_per()
-
-        fetch("/perfiles", {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            per_nombre: this.state.per_nombre,
-            per_estado: this.state.per_estado
-        }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            const array = []
-            data.map(item =>
-                array.push({
-                    key: item.id, 
-                    nombre: item.per_nombre, 
-                    estado: item.per_estado,
-                    editar: (<button
-                                onClick={()=>{this.AbrirModal_editar(item.id)}}
-                                className="btn btn-primary"
-                            >
-                                Editar
-                            </button>),
-                    eliminar: (<button
-                                className="btn btn-danger"
-                                onClick={()=>{this.Eliminar(item.id)}}
-                            >
-                                Eliminar
-                            </button>)
-                })
-            )
+            if (data !== 'usuario no encontrado verifica datos') {
+                data.map(item =>
+                    array.push({
+                        key: item.id, 
+                        nombre: item.per_nombre, 
+                        estado: (item.per_estado===1)?'Activo':'Inactivo',
+                        editar: (<button
+                                    onClick={()=>{this.AbrirModal_editar(item.id)}}
+                                    className="btn btn-primary"
+                                >
+                                    Editar
+                                </button>),
+                        eliminar: (<button
+                                    className="btn btn-danger"
+                                    onClick={()=>{this.Eliminar(item.id)}}
+                                >
+                                    Eliminar
+                                </button>)
+                    })
+                )
+            }
             this.setState({datos: array})
         });
     }
 
     AbrirModal_nuevo = () => {
         this.setState({modal_nuevo: true})
+        this.setState({per_nombre: ''})
+        this.setState({per_estado: 1})
     }
 
     CerrarModal_nuevo = () => {
@@ -157,15 +120,19 @@ class Profiles extends Component {
             }),
             }).then((res) => {
                 if (res.status === 200) {
-                this.CerrarModal_nuevo()
-                window.location.href = '/profiles'
-            } else {this.setState({error : 'Error en el servidor contacta al administrador'})}
+                    this.CerrarModal_nuevo()
+                    window.location.href = '/profiles'
+                } else if (res.status === 501) {
+                    console.log(res)
+                    this.setState({error : 'Nombre duplicado'})
+                }  else {
+                    this.setState({error : 'Error en el servidor contacta al administrador'})
+                }
             });
-            this.CerrarModal_nuevo()
-          } else {
+        } else {
             this.validator.showMessages();
             this.forceUpdate();
-          }
+        }
     }
 
     AbrirModal_editar = async(id) => {
@@ -196,15 +163,21 @@ class Profiles extends Component {
                 per_id: this.state.per_id
             }),
             }).then((res) => {
+               
                 if (res.status === 200) {
-               this.CerrarModal_editar()
-                window.location.href = '/profiles'
-            } else {this.setState({error : 'Error en el servidor contacta al administrador'})}
+                    this.CerrarModal_editar()
+                    window.location.href = '/profiles'
+                } else if (res.status === 501) {
+                    console.log(res)
+                    this.setState({error : 'Nombre duplicado'})
+                } else {
+                    this.setState({error : 'Error en el servidor contacta al administrador'})
+                }
             });
-          } else {
+        } else {
             this.validator.showMessages();
             this.forceUpdate();
-          }
+        }
     }
 
     Eliminar = (id) => {
@@ -258,7 +231,7 @@ class Profiles extends Component {
                                 name="per_nombre" 
                                 className="ant-input"
                             />
-                            {this.validator.message('nombre', this.state.per_nombre, 'required', { className: 'text-danger' })}
+                            {this.validator.message('nombre', this.state.per_nombre, 'required|alpha', { className: 'text-danger' })}
                             </div>
                         </div>
                         <div className="row form-group">

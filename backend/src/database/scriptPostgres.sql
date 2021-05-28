@@ -15,15 +15,15 @@ CREATE TABLE usuarios(
     id SERIAL PRIMARY KEY,
     use_nombre VARCHAR(50) NOT NULL,
     use_apellido VARCHAR(50) NOT NULL,
-    use_documento INTEGER NOT NULL, 
+    use_documento VARCHAR(50) NOT NULL UNIQUE, 
     use_correo VARCHAR(50) NOT NULL UNIQUE,
-    use_contrasena VARCHAR(50) NOT NULL,
+    use_contrasena VARCHAR(100) NOT NULL,
     use_tipo INTEGER NOT NULL
 );
 
 CREATE TABLE perfiles(
     id SERIAL PRIMARY KEY,
-    per_nombre VARCHAR(50) NOT NULL,
+    per_nombre VARCHAR(50) NOT NULL UNIQUE,
     per_estado INTEGER NOT NULL
 );
 

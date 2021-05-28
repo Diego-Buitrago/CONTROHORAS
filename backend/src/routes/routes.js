@@ -1,20 +1,29 @@
 const express = require('express')
 const router = express.Router()
 const {pool} = require('../database/database')
+const {Valida_crearUsuario, Valida_crearPerfil} = require('../Validations/Validations')
+const bcrypt = require('bcryptjs')
 
 router.get('/inicio_sesion', async (req, res) => {
-    console.log("Entro por aca");
     let client = await pool.connect();
     const { use_correo, use_contrasena} = req.query;
     
     try {
         let result = await client.query(
-          `SELECT * FROM usuarios WHERE use_correo = $1 and use_contrasena = $2`, [use_correo, use_contrasena]
+          `SELECT * FROM usuarios WHERE use_correo = $1`, [use_correo]
         );
         if (result.rowCount == 0) {
           return res.json('usuario no encontrado verifica datos');
         } else {
-            return res.json(result.rows);
+            
+            console.log(result.rows[0].use_contrasena)
+            const matchPassword = await bcrypt.compare(use_contrasena, result.rows[0].use_contrasena);
+
+            if(matchPassword) {
+              return res.json(result.rows);
+            } else {
+              return res.status(400).json({message: "contraseña invalida"});
+            }
         }
     } catch (error) {
       console.log(error);
@@ -49,15 +58,14 @@ router.post('/usuarios', async (req, res) => {
   
   try {
       let result = await client.query(
-        `SELECT u.id, u.use_nombre, u.use_apellido, u.use_correo, u.use_documento,u.use_tipo,p.per_nombre FROM usuarios u join perfiles p on p.id=u.use_tipo WHERE 
-        (use_nombre ILIKE REPLACE ('%${use_nombre}%', ' ', '%') OR '${use_nombre}' IS NULL OR 
-        '${use_nombre}' = '' ) AND (use_apellido ILIKE REPLACE ('%${use_apellido}%', ' ', '%') OR '${use_apellido}'
-        IS NULL OR '${use_apellido}' = '') AND (use_documento ILIKE REPLACE ('%${use_documento}%', ' ', '%') OR '${use_documento}' 
-        IS NULL OR '${use_documento}' = '')`
+        `SELECT u.id, u.use_nombre, u.use_apellido, u.use_correo, u.use_documento,u.use_tipo,p.per_nombre FROM usuarios u join perfiles p on p.id=u.use_tipo WHERE (use_nombre ILIKE REPLACE ('%${use_nombre}%', ' ', '%') OR '${use_nombre}' IS NULL OR 
+        '${use_nombre}' = '' ) AND (use_apellido ILIKE REPLACE ('%${use_apellido}%', ' ', '%') OR '${use_apellido}' IS NULL OR '${use_apellido}' = '') AND (use_documento ILIKE REPLACE ('%${use_documento}%', ' ', '%') OR '${use_documento}' 
+        IS NULL OR '${use_documento}' = '') AND use_estado !=2 `
       );
       if (result.rowCount == 0) {
         return res.json('usuario no encontrado verifica datos');
       } else {
+          
           return res.json(result.rows);
       }
   } catch (error) {
@@ -78,10 +86,14 @@ router.post('/registrar_usuario', async(req, res) => {
             use_contrasena,
             use_tipo
         } = req.body
-        const client = await pool.connect()
+        const value = await Valida_crearUsuario.validateAsync(req.body);
+
+        const salt = await bcrypt.genSalt(10)
+        const text = await bcrypt.hash(use_contrasena, salt)
+
         const response = await client.query(
             'INSERT INTO usuarios(use_nombre, use_apellido, use_documento, use_correo, use_contrasena, use_tipo) VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
-            [use_nombre, use_apellido, use_documento, use_correo, use_contrasena, use_tipo])
+            [use_nombre, use_apellido, use_documento, use_correo, text, use_tipo])
 
         if (response.rowsCount > 0) {
             res.json({
@@ -90,7 +102,7 @@ router.post('/registrar_usuario', async(req, res) => {
                 use_apellido: use_apellido,
                 use_documento: use_documento,
                 use_correo: use_correo,
-                use_contrasena: use_contrasena,
+                use_contrasena: text,
                 use_tipo: use_tipo
             })
         } else {
@@ -98,7 +110,13 @@ router.post('/registrar_usuario', async(req, res) => {
         }
     } catch (e) {
         console.log(e)
-        res.status(500).json({errorCode : e.errno, message : "Error en el servidor"});
+        if(e.constraint === 'usuarios_use_correo_key') {
+          res.status(501).json({errorCode : e.errno, message: 'Correo duplicado'})
+        } else if (e.constraint === 'usuarios_use_documento_key') {
+          res.status(502).json({errorCode : e.errno, message: 'Correo duplicado'})
+        } else {
+          res.status(500).json({errorCode : e.errno, message : "Error en el servidor"});
+        }
     } finally {
         client.release(true);
     }
@@ -110,7 +128,7 @@ router.delete('/eliminar_usuario', async(req, res) => {
 
   try {
     let result = await client.query(
-      `DELETE FROM usuarios WHERE id = $1`, [id]
+      `UPDATE usuarios SET use_estado = 2 WHERE id = $1`, [id]
     );
     if (result.rowCount == 0) {
       return res.json('usuario no encontrado verifica datos');
@@ -155,15 +173,20 @@ router.put('/editar_usuario', async(req, res) => {
           use_tipo,
           use_id
       } = req.body
-      const client = await pool.connect()
       const response = await client.query(
           'UPDATE usuarios SET use_nombre = $1, use_apellido = $2, use_documento = $3, use_correo = $4, use_tipo = $5 WHERE id = $6',
           [use_nombre, use_apellido, use_documento, use_correo, use_tipo, use_id])
           return res.json('veiculo no encontrado verifica datos');
      
   } catch (e) {
-      console.log(e)
+    console.log(e)
+    if(e.constraint === 'usuarios_use_correo_key') {
+       res.status(501).json({errorCode : e.errno, message: 'Correo duplicado'})
+    } else if (e.constraint === 'usuarios_use_documento_key') {
+      res.status(502).json({errorCode : e.errno, message: 'Correo duplicado'})
+    } else {
       res.status(500).json({errorCode : e.errno, message : "Error en el servidor"});
+    }
   } finally {
       client.release(true);
   }
@@ -210,13 +233,11 @@ router.get('/get_perfil', async(req, res) => {
     }
 });
 
-router.get('/perfiles_actvos', async(req, res) => {
+router.get('/perfiles_activos', async(req, res) => {
   let client = await pool.connect();
-  const { estado } = req.query;
-    
     try {
         let result = await client.query(
-          `SELECT * FROM perfiles WHERE per_estado = $1 `, [estado]
+          `SELECT * FROM perfiles WHERE per_estado = 1`
         );
         if (result.rowCount == 0) {
           return res.json('usuario no encontrado verifica datos');
@@ -245,7 +266,11 @@ router.put('/editar_perfil', async(req, res) => {
      
   } catch (e) {
       console.log(e)
-      res.status(500).json({errorCode : e.errno, message : "Error en el servidor"});
+      if(e.code === '23505') {
+        res.status(501).json({errorCode : e.errno, message: 'Nombre duplicado'})
+      } else {
+        res.status(500).json({errorCode : e.errno, message : "Error en el servidor"});
+      }
   } finally {
       client.release(true);
   }
@@ -258,22 +283,30 @@ router.post('/registrar_perfil', async(req, res) => {
             per_nombre,
             per_estado,
         } = req.body
-        const response = await client.query(
-            'INSERT INTO perfiles(per_nombre, per_estado) VALUES($1, $2) RETURNING id',
-            [per_nombre, per_estado])
+        const value = await Valida_crearPerfil.validateAsync(req.body);
+        
+          const response = await client.query(
+              'INSERT INTO perfiles(per_nombre, per_estado) VALUES($1, $2) RETURNING id',
+              [per_nombre, per_estado])
 
-        if (response.rowsCount > 0) {
-            res.json({
-                id: response.rows[0].id,
-                per_nombre: per_nombre,
-                per_estado: per_estado
-            })
-        } else {
-            res.json({});
-        }
+          if (response.rowsCount > 0) {
+              res.json({
+                  id: response.rows[0].id,
+                  per_nombre: per_nombre,
+                  per_estado: per_estado
+              })
+          } else {
+              res.json({});
+          }
+       
     } catch (e) {
         console.log(e)
-        res.status(500).json({errorCode : e.errno, message : "Error en el servidor"});
+        if(e.code === '23505') {
+          res.status(501).json({errorCode : e.errno, message: 'Nombre duplicado'})
+        } else {
+          res.status(500).json({errorCode : e.errno, message : "Error en el servidor"});
+        }
+        
     } finally {
         client.release(true);
     }
@@ -384,7 +417,6 @@ router.put('/editar_vehiculo', async(req, res) => {
         fecha_ven_seguro,
         fecha_ven_tecnomecanica
       } = req.body
-      const client = await pool.connect()
       const response = await client.query(
           'UPDATE motocicletas SET nro_placa = $1, marca = $2, linea = $3, modelo = $4, fecha_ven_seguro = $5, fecha_ven_tecnomecanica = $6 WHERE nro_placa = $7',
           [nro_placa, marca, linea, modelo, fecha_ven_seguro, fecha_ven_tecnomecanica, nro_placa])
@@ -440,7 +472,6 @@ router.post('/registrar_seguimiento', async(req, res) => {
         tipo_seguimiento,
         observaciones
       } = req.body
-      const client = await pool.connect()
       const response = await client.query(
           'INSERT INTO seguimiento(placa_moto, marca, linea, fecha_reparacion, tipo_seguimiento, observaciones) VALUES($1, $2, $3, $4, $5, $6)',
           [placa_moto, marca, linea, fecha_reparacion, tipo_seguimiento, observaciones])
