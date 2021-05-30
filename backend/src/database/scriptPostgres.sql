@@ -2,8 +2,7 @@ CREATE DATABASE control_vehiculos;
 
 ALTER TABLE seguimiento DROP CONSTRAINT fK_seguimiento_motocicletas;
 
-DROP TRIGGER AI_delete ON motocicletas;
-DROP TRIGGER AI_delete ON motocicletas;
+DROP insert_segumiento ON motocicletas;
 
 DROP TABLE IF EXISTS usuarios;
 DROP TABLE IF EXISTS motocicletas;
@@ -18,7 +17,8 @@ CREATE TABLE usuarios(
     use_documento VARCHAR(50) NOT NULL UNIQUE, 
     use_correo VARCHAR(50) NOT NULL UNIQUE,
     use_contrasena VARCHAR(100) NOT NULL,
-    use_tipo INTEGER NOT NULL
+    use_tipo INTEGER NOT NULL,
+    use_estado INTEGER DEFAULT 1
 );
 
 CREATE TABLE perfiles(
@@ -53,23 +53,6 @@ CREATE TABLE veihiculos_eliminados(
     linea VARCHAR(50) NOT NULL,
     modelo INTEGER NOT NULL
 );
-
--- crear disparador o trigger
-create function vehiculos_eliminados_AI() returns trigger
-as
-$$
-begin
-
-	insert into veihiculos_eliminados (nro_placa, marca, linea, modelo) values (old.nro_placa, old.marca, old.linea, old.modelo);
-
-return new;
-end
-$$
-language plpgsql;
-
-create trigger AI_delete after delete on motocicletas
-for each row 
-execute procedure vehiculos_eliminados_AI();
 
 -- crear disparador o trigger
 create function vehiculos_seguimiento() returns trigger

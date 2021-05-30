@@ -19,7 +19,7 @@ let transporter = nodemailer.createTransport(
 );
 
 router.post('/enviar_mail', (req, res) => {
-	let { to, subject, contrasena } = req.body;
+	let { to, subject } = req.body;
 	contentHTML = `<!DOCTYPE html>
 	<html lang="en">
 	
@@ -65,11 +65,7 @@ router.post('/enviar_mail', (req, res) => {
 					</tr>
 					<tr>
 						<td>
-							<span style="font-family: Arial, Helvetica, sans-serif;
-								font-weight: bold;
-								margin-left: 35px;
-								margin-top: 10px;
-								">Contraseña: ${contrasena}</span>
+							<a href="http://localhost:3000/recover_password">pulsa aqui para recuperar</a>
 						</td>
 					</tr>
 					

@@ -32,25 +32,31 @@ router.get('/inicio_sesion', async (req, res) => {
     }
 });
 
-router.get('/contrasena', async (req, res) => {
-    let client = await pool.connect();
-    const { email } = req.query;
-    
-    try {
-        let result = await client.query(
-          `SELECT contrasena FROM usuarios WHERE email = $1 `, [email]
-        );
-        if (result.rowCount == 0) {
-          return res.json('usuario no encontrado verifica datos');
-        } else {
-            return res.json(result.rows);
-        }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      client.release(true);
-    }
-});
+
+router.put('/actulizar_contrasena', async(req, res) => {
+  let client = await pool.connect();
+  const  { use_contrasena, use_correo } = req.body
+
+  const salt = await bcrypt.genSalt(10)
+  const text = await bcrypt.hash(use_contrasena, salt)
+
+  
+  try {
+      let result = await client.query(
+        `UPDATE usuarios SET use_contrasena = $1 WHERE use_correo = $2`, [text, use_correo]
+      );
+      if (result.rowCount == 0) {
+        return res.json('Error al guardar');
+      } else {
+          
+          return res.json(result.rows);
+      }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    client.release(true);
+  }
+})
 
 router.post('/usuarios', async (req, res) => {
   let client = await pool.connect();

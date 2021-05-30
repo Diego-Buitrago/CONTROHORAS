@@ -250,7 +250,7 @@ class Profiles extends Component {
                             ):
                             (
                                 <div></div>
-                            )
+                            )   
                         }
                     </form>
                 </Modal>
