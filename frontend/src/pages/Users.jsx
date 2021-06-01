@@ -55,8 +55,8 @@ class Usuarios extends Component {
               sortDirections: ['descend'],
             },
             {
-              title: 'Apellido',
-              dataIndex: 'apellido',
+                title: 'Apellido',
+                dataIndex: 'apellido',
             },
             {
                 title: 'Documento',
@@ -68,9 +68,25 @@ class Usuarios extends Component {
                 
             },
             {
+                title: 'Fecha de ingreso',
+                dataIndex: 'fecha_ingreso'
+            },
+            {
+                title: 'Salario',
+                dataIndex: 'salario'
+            },
+            {
                 title: 'Tipo',
                 dataIndex: 'perfil',
                 
+            },
+            {
+                title: 'Act por',
+                dataIndex: 'use_usu_act'
+            },
+            {
+                title: 'Fecha act',
+                dataIndex: 'use_fecha_act'
             },
             {
                 title: 'Editar',
@@ -97,7 +113,7 @@ class Usuarios extends Component {
         })
         .then(response => response.json())
         .then(data => {
-        //console.info(data)
+            console.info(data)
            const array = []
             if (data !== 'usuario no encontrado verifica datos') {
                 data.map(item =>
@@ -107,8 +123,11 @@ class Usuarios extends Component {
                         apellido: item.use_apellido,
                         documento: item.use_documento, 
                         correo: item.use_correo,
-                        tipo: item.per_id,
-                        perfil: item.per_id,
+                        fecha_ingreso: item.use_fecha_ingreso?item.use_fecha_ingreso.slice(0, -14):'',
+                        salario: item.use_salario_basico,
+                        perfil: item.per_nombre,
+                        use_usu_act: item.use_usu_act,
+                        use_fecha_act: item.use_fecha_act ? item.use_fecha_act.slice(0, -14) : '',
                         editar: (<button
                                 onClick={() => {this.Editar(item.use_id)}}
                                 className="btn btn-primary"
@@ -155,17 +174,20 @@ class Usuarios extends Component {
                         apellido: item.use_apellido,
                         documento: item.use_documento, 
                         correo: item.use_correo,
-                        tipo: item.per_id,
+                        fecha_ingreso: item.use_fecha_ingreso?item.use_fecha_ingreso.slice(0, -5):'',
+                        salario: item.use_salario_basico,
                         perfil: item.per_nombre,
+                        use_usu_act: item.use_usu_act,
+                        use_fecha_act: item.use_fecha_act ? item.use_fecha_act.slice(0, -5) : '',
                         editar: (<button
-                                onClick={() => {this.Editar(item.id)}}
+                                onClick={() => {this.Editar(item.use_id)}}
                                 className="btn btn-primary"
                             >
                                 Editar
                             </button>),
                         eliminar: (<button
                                 className="btn btn-danger"
-                                onClick={() => {this.Eliminar(item.id)}}
+                                onClick={() => {this.Eliminar(item.use_id)}}
                             >
                                 Eliminar
                             </button>)
@@ -205,7 +227,7 @@ class Usuarios extends Component {
                         use_contrasena: this.state.use_contrasena,
                         per_id: this.state.per_id,
                         use_usu_act: 'Diego',
-                        use_fecha_act: Moment().format('YYYY-MM-DD')
+                        use_fecha_act: Moment().format('YYYY-MM-DD HH:mm')
                 }),
                 }).then((res) => {
                     if (res.status === 200) {
@@ -229,11 +251,9 @@ class Usuarios extends Component {
 
     Editar = async(id) => {
         this.setState({modalEdid: true})
-        console.info(id)
 
         const res = await fetch(`/get_editar?` + new URLSearchParams({ id: id}))
         const data = await res.json()
-        console.info(data)
 
         this.setState({
             use_nombre: data[0].use_nombre,
@@ -241,8 +261,8 @@ class Usuarios extends Component {
             use_documento: data[0].use_documento,
             use_correo: data[0].use_correo,
             use_salario: data[0].use_salario_basico,
-            per_id: data[0].per_id,           
-            per_id: id
+            per_id: data[0].per_id,
+            use_id: id          
         })
     }
 
@@ -267,7 +287,8 @@ class Usuarios extends Component {
                     use_firma: 'urlejemplo',
                     per_id: this.state.per_id,
                     use_usu_act: 'Diego',
-                    use_fecha_act: Moment().format('YYYY-MM-DD')
+                    use_fecha_act: Moment().format('YYYY-MM-DD HH:mm'),
+                    id: this.state.use_id
                 }),
             }).then((res) => {
                 if (res.status === 200) {
@@ -435,7 +456,7 @@ class Usuarios extends Component {
                             <select onChange={this.onChange.bind(this)} name="per_id" className="ant-input" allowClear>
                                 {
                                     this.state.perfiles.map(perfil =>
-                                        <option key={ perfil.per_id } value={perfil.per_id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
+                                        <option key={ perfil.per_id } value={perfil.per_id}>{perfil.per_nombre}</option>
                                     )
                                 }
                             </select>
@@ -547,15 +568,14 @@ class Usuarios extends Component {
                     <div className="row form-group">
                         <label htmlFor="use_tipo"  className="col-md-3 col-form-label">Tipo de usuario</label>
                         <div className="col-md-9">
-                            <select value={this.state.per_id} onChange={this.onChange.bind(this)} name="use_tipo" className="ant-input" allowClear>
-                                <option value="">----------------</option>
+                            <select value={this.state.per_id} onChange={this.onChange.bind(this)} name="per_id" className="ant-input" allowClear>
                                 {
                                     this.state.perfiles.map(perfil =>
-                                        <option  key={perfil.per_id} value={perfil.per_id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
+                                        <option key={ perfil.per_id } value={perfil.per_id}>{perfil.per_nombre}</option>
                                     )
                                 }
                             </select>
-                            {this.validatorEdi.message('tipo usuario', this.state.use_tipo, 'required', { className: 'text-danger' })}
+                            {this.validatorEdi.message('tipo usuario', this.state.per_id, 'required', { className: 'text-danger' })}
                         </div>       
                     </div>
                     {
@@ -593,7 +613,7 @@ class Usuarios extends Component {
                         <div className="row" >
                     <div className="col-md-12">
                         <Table 
-                            className="table table-striped table-bordered mt-5" 
+                            className="table table-striped table-bordered mt-4" 
                             columns={this.state.columns} 
                             dataSource={this.state.datos}
                         />

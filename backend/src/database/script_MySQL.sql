@@ -21,7 +21,7 @@ CREATE TABLE horas(
     hor_id INT(5) PRIMARY KEY AUTO_INCREMENT,
     hor_nombre VARCHAR(50) NOT NULL UNIQUE,
     hor_codigo INT(50) NOT NULL UNIQUE,
-    hor_Porcentaje DOUBLE,
+    hor_porcentaje DOUBLE,
     hor_usu_act VARCHAR(50) NOT NULL,
     hor_fecha_act DATE NOT NULL
 );
@@ -68,6 +68,20 @@ CREATE TABLE obras(
     obr_usu_act VARCHAR(50) NOT NULL,
     obr_fecha_act DATE NOT NULL
 );
+
+CREATE TABLE recuperar(
+    rec_id INT(5) PRIMARY KEY AUTO_INCREMENT,
+    rec_codigo VARCHAR(50),
+    use_id INT(5),
+    rec_estado INT(1) DEFAULT 1,
+    rec_email VARCHAR(50),
+    rec_fecha DATETIME(0) 
+);
+
+ALTER TABLE recuperar 
+ADD CONSTRAINT `fk_recuperar` 
+FOREIGN KEY (`use_id`) 
+REFERENCES `usuarios` (`use_id`);
 
 ALTER TABLE usuarios 
 ADD CONSTRAINT `fk_usuarios_perfiles` 

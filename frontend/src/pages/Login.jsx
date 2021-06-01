@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { Modal } from 'antd';
+import Moment from 'moment'
 import useAuthContext from "../hooks/useAuthContext";
 
 const Login = () => {
@@ -19,16 +20,28 @@ const Login = () => {
         } else if (pass === '') {
             setError('ingresa tu contraseña')
         } else {
-            const res = await fetch('/inicio_sesion?' + new URLSearchParams({ use_correo: email, use_contrasena: pass }));
-            const data = await res.json();
+            
+            fetch('/inicio_sesion' , {
+              method: 'POST',
+              headers: {
+                 'Content-Type': 'application/json',
+            },
+              body: JSON.stringify({
+                use_correo: email, 
+                use_contrasena: pass
+              }),
+            })
+            .then(response => response.json())
+            .then(data => {
 
-            if(data.message === 'contraseña invalida') {
-                setError('Datos invalidos')
-            } else if(data.length !== 0) {
-              //Login()
-              window.localStorage.setItem("authentication", true);
-              window.location.href = '/home'
-            }
+              if(data.message === 'contraseña invalida') {
+                  setError('Datos invalidos')
+              } else if(data.length !== 0) {
+                //Login()
+                window.localStorage.setItem("authentication", true);
+                window.location.href = '/home'
+              } 
+            }) 
         }    
     }
 
@@ -52,9 +65,11 @@ const Login = () => {
           },
           body: JSON.stringify({
             to: correo_recu,
-            subject: "recuperar contraseña"
+            subject: "recuperar contraseña",
+            fec : Moment().format('YYYY-MM-DD HH:mm')
           })
         }).then(res => {
+            console.warn(res);
             CerrarModal_recuperar()
       })
     }
@@ -72,7 +87,7 @@ const Login = () => {
             <form id="form" className="form-group">
               <p>Te enviaremos un mensaje a tu correo registrado</p>
               <div className="row form-group">
-                  <label htmlFor="correo_recu" className="col-md-3 col-form-label">Indresa tu correo</label>
+                  <label htmlFor="correo_recu" className="col-md-3 col-form-label">Ingresa tu correo</label>
                   <div className="col-md-9"><input
                     onChange={(e)=>{setCorreo_recu(e.target.value)}}
                     type="email"

@@ -2,12 +2,10 @@ import React, {Component} from 'react';
 import SimpleReactValidator from 'simple-react-validator';
 
 SimpleReactValidator.addLocale('custom', {
-
     accepted: 'Hab SoSlI’ Quch!',
     required: 'El campo :attribute es obligatorio.',
     max: ':attribute no debe ser mayor a :max:type.',
     min: 'El tamaño de :attribute debe ser de al menos :min:type.',
-
 });
 
 class Recuperar extends Component {
@@ -92,8 +90,7 @@ class Recuperar extends Component {
                   <div className="col-12">
                     <button type="submit" className="btn btn-primary btn-block">Recuperar</button>
                   </div>
-                </div>
-                
+                </div>  
                 </form>
                 <div className="row">
                   <div className="col-8">
@@ -110,8 +107,7 @@ class Recuperar extends Component {
                 </div>
                 
               </div>
-          </>
-         
+          </>    
         );
     }
 }

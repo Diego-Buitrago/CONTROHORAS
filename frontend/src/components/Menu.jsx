@@ -1,5 +1,5 @@
 import React from 'react'
-import {_Users, _Profiles} from '../config/path'
+import {_Users, _Profiles, _Horas, _Costos, _Obras} from '../config/path'
 
 const Menu = () => {
 
@@ -29,16 +29,16 @@ const Menu = () => {
                 <li className="nav-item menu-open">
                   <ul className="nav nav-treeview">
                     <li className="nav-item">
-                      <a href="" className="nav-link">
+                      <a className="nav-link">
                         <i className="far fa-circle nav-icon"></i>
                         <p>Configuración</p>
                       </a>
                         <ul className="">
-                          <li><a href={_Profiles}>Perfiles</a></li>
-                          <li><a href={_Users}>Usuarios</a></li>
-                          <li><a href="">Horas</a></li>
-                          <li><a href="">Obras</a></li>
-                          <li><a href="">Centro de Costos</a></li>
+                          <li className=""><a href={_Profiles}>Perfiles</a></li>
+                          <li className=""><a href={_Users}>Usuarios</a></li>
+                          <li className=""><a href={_Horas}>Horas</a></li>
+                          <li className=""><a href={_Obras}>Obras</a></li>
+                          <li className=""><a href={_Costos}>Centro de Costos</a></li>
                         </ul>
                     </li>
                     <li className="nav-item">
