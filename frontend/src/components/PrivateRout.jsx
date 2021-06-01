@@ -4,7 +4,7 @@ import {_Login} from '../config/path';
 import useAuthContext from '../hooks/useAuthContext';
 
 const PrivateRoute = (props) => {
-    const isAutenticated = localStorage.getItem("authentication")
+    const isAutenticated = true//localStorage.getItem("authentication")
 
     if (!isAutenticated) {
         return <Redirect to={_Login}/>;

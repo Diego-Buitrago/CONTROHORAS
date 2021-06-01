@@ -4,7 +4,7 @@ import {_Home} from "../config/path";
 import useAuthContext from "../hooks/useAuthContext";
 
 const PublicRoute = (props) => {
-  const isAutenticated  = localStorage.getItem("authentication")
+  const isAutenticated  = true//localStorage.getItem("authentication")
 
   if (isAutenticated) {
     return <Redirect to={_Home} />;

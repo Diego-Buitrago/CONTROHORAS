@@ -5,6 +5,8 @@ import Footer from '../components/Footer';
 import Menu from '../components/Menu';
 import Nav from '../components/Nav';
 import SimpleReactValidator from 'simple-react-validator'
+const moment = require("moment");
+
 SimpleReactValidator.addLocale('custom', {
     accepted: 'Hab SoSlI’ Quch!',
     required: 'El campo :attribute es obligatorio.',
@@ -19,6 +21,7 @@ class Profiles extends Component {
         per_id: null,
         per_nombre: '',
         per_estado: '',
+        per_usu_act: '',
         modal_nuevo: false,
         modal_editar: false,
         top: 'topLeft',
@@ -79,14 +82,14 @@ class Profiles extends Component {
                         nombre: item.per_nombre, 
                         estado: (item.per_estado===1)?'Activo':'Inactivo',
                         editar: (<button
-                                    onClick={()=>{this.AbrirModal_editar(item.id)}}
+                                    onClick={()=>{this.AbrirModal_editar(item.per_id)}}
                                     className="btn btn-primary"
                                 >
                                     Editar
                                 </button>),
                         eliminar: (<button
                                     className="btn btn-danger"
-                                    onClick={()=>{this.Eliminar(item.id)}}
+                                    onClick={()=>{this.Eliminar(item.per_id)}}
                                 >
                                     Eliminar
                                 </button>)
@@ -116,7 +119,9 @@ class Profiles extends Component {
             },
             body: JSON.stringify({
                 per_nombre: this.state.per_nombre,
-                per_estado: this.state.per_estado
+                per_estado: this.state.per_estado,
+                per_usu_act: 'Diego',
+                per_fecha_act: moment().format('YYYY-MM-DD')
             }),
             }).then((res) => {
                 if (res.status === 200) {
@@ -139,7 +144,7 @@ class Profiles extends Component {
         this.setState({modal_editar: true})
         const res = await fetch(`/get_perfil?` + new URLSearchParams({ id: id}))
         const data = await res.json()
-        this.setState({
+       this.setState({
             per_nombre: data[0].per_nombre,
             per_estado: data[0].per_estado,
             per_id: id
@@ -151,6 +156,7 @@ class Profiles extends Component {
     }
 
     Accion_editar = () => {
+        console.log(this.state)
         if (this.validator.allValid()) {
             fetch("/editar_perfil", {
                 method: "PUT",
@@ -160,6 +166,8 @@ class Profiles extends Component {
             body: JSON.stringify({
                 per_nombre: this.state.per_nombre,
                 per_estado: this.state.per_estado,
+                per_usu_act: 'Diego',
+                per_fecha_act: moment().format('YYYY-MM-DD'),
                 per_id: this.state.per_id
             }),
             }).then((res) => {
@@ -176,7 +184,7 @@ class Profiles extends Component {
             });
         } else {
             this.validator.showMessages();
-            this.forceUpdate();
+            this.forceUpdate(); 
         }
     }
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import {_Home, _Users, _Profiles} from '../config/path'
+import {_Home } from '../config/path'
 
 const Nav = () => {
 
@@ -20,14 +20,9 @@ const Nav = () => {
             <a href={_Home} className="nav-link">Home</a>
           </li>
           <li className="nav-item d-none d-sm-inline-block">
-            <a href={_Users} className="nav-link">Users</a>
+            <a onClick={Cerrar_sesion} className="nav-link text-danger">Cerrar sesion</a>
           </li>
-          <li className="nav-item d-none d-sm-inline-block">
-            <a href={_Profiles} className="nav-link">Profiles</a>
-          </li>
-          <li className="nav-item d-none d-sm-inline-block">
-            <button onClick={Cerrar_sesion} className="btn-danger mt-1 flexbox">Cerrar sesion</button>
-          </li>
+  
         </ul>
 
 

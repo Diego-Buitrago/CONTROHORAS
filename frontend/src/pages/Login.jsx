@@ -85,13 +85,13 @@ const Login = () => {
           </Modal>
           <div className="login-box">
           <div className="login-logo">
-            <h3 className="bg-primary p-3">Sistema de Gestion de Vehiculos</h3>
+          <img src="../Potenco-logo-mini.png"/>
           </div>
         
           <div className="card">
             <div className="card-body login-card-body" >
           <div className="App">
-            <p className="login-box-msg">Inicia sesión para comenzar</p>
+            <p className="login-box-msg">Control de Horas</p>
             <form onSubmit={(e)=>{LoginUsuario(e)}}>
               <div className="input-group mb-3">
                 <input onChange={(e)=>{setEmail(e.target.value)}} type="email" className="form-control" placeholder="Email"/>
@@ -109,9 +109,9 @@ const Login = () => {
                 </div>
               </div>
             </div>
-            <div className="row justify-content-end mr-2">
+            <div className="row justify-content-center">
               <p>
-                <a onClick={AbrirModal_recuperar} className="c-primary">Olvidaste la contraseña</a>
+                <a onClick={AbrirModal_recuperar} className="c-primary">Olvidaste tu contraseña?</a>
               </p>
               </div>
             <div className="row">
@@ -123,8 +123,12 @@ const Login = () => {
             </div>
             
             </form>
+            
             <div className="row">
               <div className="col-8">
+              </div>
+              <div className="col-12 mt-4 text-center">
+                <img src="../logonew1.png" width="100px"/>
               </div>
               <div className="col-12 ml-4 mt-4">
                 <p>

@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import Menu from '../components/Menu';
 import Nav from '../components/Nav';
 import SimpleReactValidator from 'simple-react-validator'
+import Moment from 'moment'
 SimpleReactValidator.addLocale('custom', {
     /*  pass: {
         message: 'La :attribute debe ser :values.',
@@ -38,7 +39,10 @@ class Usuarios extends Component {
         use_correo: '',
         use_contrasena: '',
         conf_use_contrasena: '',
-        use_tipo: '',
+        use_fecha_ingreso: '',
+        use_salario: '',
+        use_firma: '',
+        per_id: '',
         per_nombre: '',
         modal: false,
         modalEdid: false,
@@ -93,6 +97,7 @@ class Usuarios extends Component {
         })
         .then(response => response.json())
         .then(data => {
+        //console.info(data)
            const array = []
             if (data !== 'usuario no encontrado verifica datos') {
                 data.map(item =>
@@ -102,17 +107,17 @@ class Usuarios extends Component {
                         apellido: item.use_apellido,
                         documento: item.use_documento, 
                         correo: item.use_correo,
-                        tipo: item.use_tipo,
-                        perfil: item.per_nombre,
+                        tipo: item.per_id,
+                        perfil: item.per_id,
                         editar: (<button
-                                onClick={() => {this.Editar(item.id)}}
+                                onClick={() => {this.Editar(item.use_id)}}
                                 className="btn btn-primary"
                             >
                                 Editar
                             </button>),
                         eliminar: (<button
                                 className="btn btn-danger"
-                                onClick={() => {this.Eliminar(item.id)}}
+                                onClick={() => {this.Eliminar(item.use_id)}}
                             >
                                 Eliminar
                             </button>)
@@ -150,7 +155,7 @@ class Usuarios extends Component {
                         apellido: item.use_apellido,
                         documento: item.use_documento, 
                         correo: item.use_correo,
-                        tipo: item.use_tipo,
+                        tipo: item.per_id,
                         perfil: item.per_nombre,
                         editar: (<button
                                 onClick={() => {this.Editar(item.id)}}
@@ -174,7 +179,7 @@ class Usuarios extends Component {
     Nuevo = () => {
         this.setState({modal: true})
         this.Reset_user()
-        this.setState({use_tipo: this.state.perfiles[0].id})
+        this.setState({per_id: this.state.perfiles[0].per_id})
     }
 
     CerrarModal = () => {
@@ -194,8 +199,13 @@ class Usuarios extends Component {
                         use_apellido: this.state.use_apellido,
                         use_documento: this.state.use_documento,
                         use_correo: this.state.use_correo,
+                        use_fecha_ingreso: this.state.use_fecha_ingreso,
+                        use_salario: this.state.use_salario,
+                        use_firma: 'urlejemplo',
                         use_contrasena: this.state.use_contrasena,
-                        use_tipo: this.state.use_tipo
+                        per_id: this.state.per_id,
+                        use_usu_act: 'Diego',
+                        use_fecha_act: Moment().format('YYYY-MM-DD')
                 }),
                 }).then((res) => {
                     if (res.status === 200) {
@@ -208,7 +218,7 @@ class Usuarios extends Component {
                     } else {
                         this.setState({error: 'Error en el servidor contacta al administrador'})
                     }
-                });
+                }); 
             
         } else {
            
@@ -219,17 +229,20 @@ class Usuarios extends Component {
 
     Editar = async(id) => {
         this.setState({modalEdid: true})
+        console.info(id)
 
         const res = await fetch(`/get_editar?` + new URLSearchParams({ id: id}))
         const data = await res.json()
+        console.info(data)
 
         this.setState({
             use_nombre: data[0].use_nombre,
             use_apellido: data[0].use_apellido,
             use_documento: data[0].use_documento,
             use_correo: data[0].use_correo,
-            use_tipo: data[0].use_tipo,           
-            use_id: id
+            use_salario: data[0].use_salario_basico,
+            per_id: data[0].per_id,           
+            per_id: id
         })
     }
 
@@ -249,9 +262,12 @@ class Usuarios extends Component {
                     use_apellido: this.state.use_apellido,
                     use_documento: this.state.use_documento,
                     use_correo: this.state.use_correo,
-                    use_contrasena: this.state.use_contrasena,
-                    use_tipo: this.state.use_tipo,
-                    use_id: this.state.use_id
+                    use_fecha_ingreso: this.state.use_fecha_ingreso,
+                    use_salario: this.state.use_salario,
+                    use_firma: 'urlejemplo',
+                    per_id: this.state.per_id,
+                    use_usu_act: 'Diego',
+                    use_fecha_act: Moment().format('YYYY-MM-DD')
                 }),
             }).then((res) => {
                 if (res.status === 200) {
@@ -359,6 +375,39 @@ class Usuarios extends Component {
                         </div>       
                     </div>
                     <div className="row form-group">
+                        <label htmlFor="use_fecha_ingreso" className="col-md-3 col-form-label">Fecha de ingreso</label>
+                        <div className="col-md-9"><input
+                           onChange={this.onChange.bind(this)}
+                            type="date"
+                            name="use_fecha_ingreso"
+                            className="ant-input"
+                        />
+                        {this.validator.message('fecha de ingreso', this.state.use_fecha_ingreso, 'required', { className: 'text-danger' })}
+                        </div>       
+                    </div>
+                    <div className="row form-group">
+                        <label htmlFor="use_salario" className="col-md-3 col-form-label">Salario básico</label>
+                        <div className="col-md-9"><input
+                           onChange={this.onChange.bind(this)}
+                            type="number"
+                            name="use_salario"
+                            className="ant-input"
+                        />
+                        {this.validator.message('salario básico', this.state.use_salario, 'required', { className: 'text-danger' })}
+                        </div>       
+                    </div>
+                    {/* <div className="row form-group">
+                        <label htmlFor="use_firma" className="col-md-3 col-form-label">Firma digital</label>
+                        <div className="col-md-9"><input
+                           onChange={this.onChange.bind(this)}
+                            type="file"
+                            name="use_firma"
+                            className="ant-input"
+                        />
+                        {this.validator.message('firma', this.state.use_firma, 'required', { className: 'text-danger' })}
+                        </div>       
+                    </div> */}
+                    <div className="row form-group">
                         <label htmlFor="use_contrasena" className="col-md-3 col-form-label">Contraseña</label>
                         <div className="col-md-9"><input
                            onChange={this.onChange.bind(this)}
@@ -383,14 +432,14 @@ class Usuarios extends Component {
                     <div className="row form-group">
                         <label htmlFor="use_tipo" className="col-md-3 col-form-label">Tipo de usuario</label>
                         <div className="col-md-9">
-                            <select onChange={this.onChange.bind(this)} name="use_tipo" className="ant-input" allowClear>
+                            <select onChange={this.onChange.bind(this)} name="per_id" className="ant-input" allowClear>
                                 {
                                     this.state.perfiles.map(perfil =>
-                                        <option key={ perfil.id } value={perfil.id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
+                                        <option key={ perfil.per_id } value={perfil.per_id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
                                     )
                                 }
                             </select>
-                            {this.validator.message('tipo usuario', this.state.use_tipo, 'required', { className: 'text-danger' })}
+                            {this.validator.message('tipo usuario', this.state.per_id, 'required', { className: 'text-danger' })}
                         </div>       
                     </div>
                     {
@@ -460,13 +509,49 @@ class Usuarios extends Component {
                         </div>       
                     </div>
                     <div className="row form-group">
+                        <label htmlFor="use_fecha_ingreso" className="col-md-3 col-form-label">Fecha de ingreso</label>
+                        <div className="col-md-9"><input
+                            onChange={this.onChange.bind(this)}
+                            value={this.state.use_fecha_ingreso}
+                            type="date"
+                            name="use_fecha_ingreso"
+                            className="ant-input"
+                        />
+                        {this.validator.message('fecha de ingreso', this.state.use_fecha_ingreso, 'required', { className: 'text-danger' })}
+                        </div>       
+                    </div>
+                    <div className="row form-group">
+                        <label htmlFor="use_salario" className="col-md-3 col-form-label">Salario básico</label>
+                        <div className="col-md-9"><input
+                            onChange={this.onChange.bind(this)}
+                            value={this.state.use_salario}
+                            type="number"
+                            name="use_salario"
+                            className="ant-input"
+                        />
+                        {this.validator.message('salario básico', this.state.use_salario, 'required', { className: 'text-danger' })}
+                        </div>       
+                    </div>
+                    {/* <div className="row form-group">
+                        <label htmlFor="use_firma" className="col-md-3 col-form-label">Firma digital</label>
+                        <div className="col-md-9"><input
+                           onChange={this.onChange.bind(this)}
+                            type="file"
+                            name="use_firma"
+                            className="ant-input"
+                        />
+                        {this.validator.message('firma', this.state.use_firma, 'required', { className: 'text-danger' })}
+                        </div>       
+                    </div> */}
+                     
+                    <div className="row form-group">
                         <label htmlFor="use_tipo"  className="col-md-3 col-form-label">Tipo de usuario</label>
                         <div className="col-md-9">
-                            <select value={this.state.use_tipo} onChange={this.onChange.bind(this)} name="use_tipo" className="ant-input" allowClear>
+                            <select value={this.state.per_id} onChange={this.onChange.bind(this)} name="use_tipo" className="ant-input" allowClear>
                                 <option value="">----------------</option>
                                 {
                                     this.state.perfiles.map(perfil =>
-                                        <option  key={perfil.id} value={perfil.id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
+                                        <option  key={perfil.per_id} value={perfil.per_id}>{perfil.per_estado === 1 ? perfil.per_nombre : ''}</option>
                                     )
                                 }
                             </select>
