@@ -160,39 +160,53 @@ class Obras extends Component {
                     visible={this.state.modal_nuevo}
                     onOk={this.Accion_nuevo.bind(this)}
                     onCancel={this.CerrarModal_nuevo.bind(this)}
+                    width="750px"
                     centered
                 >
-                    <form id="form" onSubmit="" className="form-group">
-                        <div className="row form-group">
-                            <label htmlFor="cos_nombre" className="col-md-3 col-form-label">Nombre</label>
-                            <div className="col-md-9"><input
-                                onChange={this.onChange.bind(this)}
-                                type="text"
-                                name="cos_nombre" 
-                                className="ant-input"
-                            />
-                            {this.validator.message('nombre', this.state.cos_nombre, 'required|alpha', { className: 'text-danger' })}
+                    <form id="form" onSubmit="" className="form-group col-md-12">
+                        <div className="row contenedor ml-4">
+                            <div className="row col-md-6">
+                                <label htmlFor="obr_nombre" className="col-md-12 col-form-label">Nombre</label>
+                                <div className="col-md-10"><input
+                                    onChange={this.onChange.bind(this)}
+                                    type="text"
+                                    name="obr_nombre" 
+                                    className="ant-input"
+                                />
+                                {this.validator.message('nombre', this.state.obr_nombre, 'required|alpha', { className: 'text-danger' })}
+                                </div>
                             </div>
-                        </div>
-                        <div className="row form-group">
-                            <label htmlFor="cos_codigo" className="col-md-3 col-form-label">Codigo</label>
-                            <div className="col-md-9"><input
-                                onChange={this.onChange.bind(this)}
-                                type="number"
-                                name="cos_codigo" 
-                                className="ant-input"
-                            />
-                            {this.validator.message('codigo', this.state.cos_codigo, 'required', { className: 'text-danger' })}
+                            <div className="row colmd-6">
+                                <label htmlFor="obr_val_operador" className="col-md-12  col-form-label">Valor operador</label>
+                                <div className="col-md-10"><input
+                                    onChange={this.onChange.bind(this)}
+                                    type="number"
+                                    name="obr_val_operador" 
+                                    className="ant-input"
+                                />
+                                {this.validator.message('Val operador', this.state.obr_val_operador, 'required', { className: 'text-danger' })}
+                                </div>
                             </div>
+                            <div className="row colmd-6">
+                                <label htmlFor="obr_val_maquina" className="col-md-12  col-form-label">Valor operador</label>
+                                <div className="col-md-10"><input
+                                    onChange={this.onChange.bind(this)}
+                                    type="number"
+                                    name="obr_val_maquina" 
+                                    className="ant-input"
+                                />
+                                {this.validator.message('Val maquina', this.state.obr_val_maquina, 'required', { className: 'text-danger' })}
+                                </div>
+                            </div>
+                            {
+                                this.state.error != null ? (
+                                    <div id="error" className="alert alert-danger mt-2">{this.state.error}</div>
+                                ):
+                                (
+                                    <div></div>
+                                )   
+                            }
                         </div>
-                        {
-                            this.state.error != null ? (
-                                <div id="error" className="alert alert-danger mt-2">{this.state.error}</div>
-                            ):
-                            (
-                                <div></div>
-                            )   
-                        }
                     </form>
                 </Modal>
                 <Nav></Nav>
@@ -202,7 +216,7 @@ class Obras extends Component {
                         <div className="container-fluid">
                             <div className="row justify-content-end">
                                     <div className="col-md-1"><br/>
-                                        <button /* onClick={this.AbrirModal_nuevo.bind(this)} */ className="btn btn-success">Nuevo</button>
+                                        <button onClick={this.AbrirModal_nuevo.bind(this)} className="btn btn-success">Nuevo</button>
                                     </div>
                             </div>
                             <div className="row" >
