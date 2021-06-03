@@ -11,11 +11,11 @@ SimpleReactValidator.addLocale('custom', {
 
 class Recuperar extends Component {
 
-    validator = new SimpleReactValidator({ locale:'custom'});
+  validator = new SimpleReactValidator({ locale:'custom'});
     
-    state = {
-        contrasena: '',
-        confi_contrasena: ''
+  state = {
+      contrasena: '',
+      confi_contrasena: ''
     }
 
     componentDidMount() {
