@@ -8,6 +8,9 @@ import Moment from 'moment';
 SimpleReactValidator.addLocale('custom', {
     accepted: 'Hab SoSlI’ Quch!',
     required: 'El campo :attribute es obligatorio.',
+    max: ':attribute no debe ser mayor a :max:type.',
+    min: 'El tamaño de :attribute debe ser de al menos :min:type.',
+    alpha: ':attribute sólo debe contener letras.'
 });
 
 class Costos extends Component {
@@ -73,7 +76,7 @@ class Costos extends Component {
                         nombre: item.cos_nombre, 
                         codigo: item.cos_codigo,
                         cos_usu_act: item.cos_usu_act,
-                        cos_fecha_act: item.cos_fecha_act ? item.cos_fecha_act.slice(0, -14) : '',
+                        cos_fecha_act: item.cos_fecha_act,
                         editar: (<button
                                     onClick={()=>{this.AbrirModal_editar(item.cos_id)}}
                                     className="btn btn-primary"
@@ -95,6 +98,7 @@ class Costos extends Component {
 
     AbrirModal_nuevo = () => {
         this.setState({modal_nuevo: true})
+        this.Reset_costos()
     }
 
     CerrarModal_nuevo = () => {
@@ -111,7 +115,7 @@ class Costos extends Component {
             body: JSON.stringify({
                 cos_nombre: this.state.cos_nombre,
                 cos_codigo: this.state.cos_codigo,
-                cos_usu_act: 'Diego',
+                cos_usu_act: localStorage.getItem("usuario"),
                 cos_fecha_act: Moment().format('YYYY-MM-DD HH:mm')
             }),
             }).then((res) => {
@@ -153,7 +157,7 @@ class Costos extends Component {
             body: JSON.stringify({
                 cos_nombre: this.state.cos_nombre,
                 cos_codigo: this.state.cos_codigo,
-                cos_usu_act: 'Diego',
+                cos_usu_act: localStorage.getItem("usuario"),
                 cos_fecha_act: Moment().format('YYYY-MM-DD HH:mm'),
                 id: this.state.cos_id
             }),
@@ -190,11 +194,20 @@ class Costos extends Component {
         this.setState({
             [e.target.name]: e.target.value
         })
-    } 
+    }
+    
+    Reset_costos = () => {
+        this.setState({
+            cos_id: null,
+            cos_nombre: '',
+            cos_codigo: '',
+        })
+    }
+
 
     render () {
         return (
-            <div className="wrapper">
+            <div className="wrapper col-md-12">
                 <Modal
                     title="Crear Centro de costos"
                     visible={this.state.modal_nuevo}
@@ -211,7 +224,7 @@ class Costos extends Component {
                                 name="cos_nombre" 
                                 className="ant-input"
                             />
-                            {this.validator.message('nombre', this.state.cos_nombre, 'required|alpha', { className: 'text-danger' })}
+                            {this.validator.message('nombre', this.state.cos_nombre, 'required|max:50|min:3', { className: 'text-danger' })}
                             </div>
                         </div>
                         <div className="row form-group">
@@ -222,7 +235,7 @@ class Costos extends Component {
                                 name="cos_codigo" 
                                 className="ant-input"
                             />
-                            {this.validator.message('codigo', this.state.cos_codigo, 'required', { className: 'text-danger' })}
+                            {this.validator.message('codigo', this.state.cos_codigo, 'required|numeric|min:0,num|max:10|min:5', { className: 'text-danger' })}
                             </div>
                         </div>
                         {
@@ -252,7 +265,7 @@ class Costos extends Component {
                                 name="cos_nombre" 
                                 className="ant-input"
                             />
-                            {this.validator.message('nombre', this.state.cos_nombre, 'required|alpha', { className: 'text-danger' })}
+                          {this.validator.message('nombre', this.state.cos_nombre, 'required|max:50|min:3', { className: 'text-danger' })}
                             </div>
                         </div>
                         <div className="row form-group">
@@ -264,7 +277,7 @@ class Costos extends Component {
                                 name="cos_codigo" 
                                 className="ant-input"
                             />
-                            {this.validator.message('codigo', this.state.cos_codigo, 'required', { className: 'text-danger' })}
+                           {this.validator.message('codigo', this.state.cos_codigo, 'required|numeric|min:0,num|max:10|min:5', { className: 'text-danger' })}
                             </div>
                         </div>
                         {

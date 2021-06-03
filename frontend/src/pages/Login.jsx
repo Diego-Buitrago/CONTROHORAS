@@ -9,6 +9,8 @@ const Login = () => {
     const [pass, setPass] = useState('')
     const [correo_recu, setCorreo_recu] = useState('')
     const [error, setError] = useState(null)
+    const [errorRecuperar, setErrorRecuperar] = useState(null)
+    const [exito, setExito] = useState(null)
     const [modal, setModal] = useState(false)
     //const { Login } = useAuthContext();
   
@@ -33,11 +35,12 @@ const Login = () => {
             })
             .then(response => response.json())
             .then(data => {
-
+              console.log(data)
               if(data.message === 'contraseña invalida') {
                   setError('Datos invalidos')
               } else if(data.length !== 0) {
                 //Login()
+                window.localStorage.setItem("usuario", `${data[0].use_nombre} ${data[0].use_apellido}`)
                 window.localStorage.setItem("authentication", true);
                 window.location.href = '/home'
               } 
@@ -56,7 +59,6 @@ const Login = () => {
   const Accion_recuperar = () => {
 
     if(correo_recu) {
-      window.localStorage.setItem('recuperar', correo_recu)
 
       fetch("/enviar_mail", {
           method: "POST",
@@ -70,7 +72,14 @@ const Login = () => {
           })
         }).then(res => {
             console.warn(res);
-            CerrarModal_recuperar()
+            if (res.status === 200){
+              setExito('Revisa tu correo enviamos un link de recuperacion de contraseña')
+              CerrarModal_recuperar()
+              
+            } else if (res.status === 501) {
+              setErrorRecuperar('Usuario no encontrado')
+            }
+            
       })
     }
   }
@@ -97,6 +106,14 @@ const Login = () => {
                 </div>
               </div>
             </form>
+            {
+            errorRecuperar != null ? (
+                <div id="error" className="alert alert-danger mt-2">{errorRecuperar}</div>
+              ):
+              (
+                <div></div>
+            )
+          }
           </Modal>
           <div className="login-box">
           <div className="login-logo">
@@ -160,6 +177,14 @@ const Login = () => {
           {
             error != null ? (
                 <div id="error" className="alert alert-danger mt-2">{error}</div>
+              ):
+              (
+                <div></div>
+            )
+          }
+          {
+            exito != null ? (
+                <div id="error" className="alert alert-success mt-2">{exito}</div>
               ):
               (
                 <div></div>

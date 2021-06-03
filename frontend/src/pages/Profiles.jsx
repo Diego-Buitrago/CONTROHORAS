@@ -10,6 +10,9 @@ const moment = require("moment");
 SimpleReactValidator.addLocale('custom', {
     accepted: 'Hab SoSlI’ Quch!',
     required: 'El campo :attribute es obligatorio.',
+    max: ':attribute no debe ser mayor a :max:type.',
+    min: 'El tamaño de :attribute debe ser de al menos :min:type.',
+    alpha: ':attribute sólo debe contener letras.'
 });
 
 class Profiles extends Component {
@@ -91,7 +94,7 @@ class Profiles extends Component {
                         nombre: item.per_nombre, 
                         estado: (item.per_estado===1)?'Activo':'Inactivo',
                         per_usu_act: item.per_usu_act,
-                        per_fecha_act: item.per_fecha_act, //? item.per_fecha_act.slice(0, -14) : '',
+                        per_fecha_act: item.per_fecha_act,
                         editar: (<button
                                     onClick={()=>{this.AbrirModal_editar(item.per_id)}}
                                     className="btn btn-primary"
@@ -113,7 +116,7 @@ class Profiles extends Component {
 
     AbrirModal_nuevo = () => {
         this.setState({modal_nuevo: true})
-        this.setState({per_nombre: ''})
+        this.Reset_per()
         this.setState({per_estado: 1})
     }
 
@@ -131,7 +134,7 @@ class Profiles extends Component {
             body: JSON.stringify({
                 per_nombre: this.state.per_nombre,
                 per_estado: this.state.per_estado,
-                per_usu_act: 'Diego',
+                per_usu_act: localStorage.getItem("usuario"),
                 per_fecha_act: moment().format('YYYY-MM-DD HH:mm')
             }),
             }).then((res) => {
@@ -177,7 +180,7 @@ class Profiles extends Component {
             body: JSON.stringify({
                 per_nombre: this.state.per_nombre,
                 per_estado: this.state.per_estado,
-                per_usu_act: 'Diego',
+                per_usu_act: localStorage.getItem("usuario"),
                 per_fecha_act: moment().format('YYYY-MM-DD HH:mm'),
                 per_id: this.state.per_id
             }),
@@ -215,13 +218,10 @@ class Profiles extends Component {
 
     Reset_per = () => {
         this.setState({
-            datos: [],
-            per_id: '',
+            per_id: null,
             per_nombre: '',
             per_estado: '',
-            modal_nuevo: false,
-            setModal_editar: false,
-            error: null
+            per_usu_act: ''
         })
     }
 
@@ -233,7 +233,7 @@ class Profiles extends Component {
 
     render () {
         return (
-            <div className="wrapper">
+            <div className="wrapper col-md-12">
                 <Modal
                     title="Crear Perfil"
                     visible={this.state.modal_nuevo}
@@ -250,7 +250,7 @@ class Profiles extends Component {
                                 name="per_nombre" 
                                 className="ant-input"
                             />
-                            {this.validator.message('nombre', this.state.per_nombre, 'required|alpha', { className: 'text-danger' })}
+                            {this.validator.message('nombre', this.state.per_nombre, 'required|max:50|min:3', { className: 'text-danger' })}
                             </div>
                         </div>
                         <div className="row form-group">
@@ -260,7 +260,7 @@ class Profiles extends Component {
                                     <option value="1">Activo</option>
                                     <option value="0">Inactivo</option>
                                 </select>
-                                {this.validator.message('estado', this.state.per_estado, 'required',  { className: 'text-danger' })}
+                                {this.validator.message('estado', this.state.per_estado, 'required|integer',  { className: 'text-danger' })}
                             </div>    
                         </div>
                         {
@@ -290,7 +290,7 @@ class Profiles extends Component {
                                 name="per_nombre" 
                                 className="ant-input"
                             />
-                            {this.validator.message('nombre', this.state.per_nombre, 'required|alpha', { className: 'text-danger' })}
+                            {this.validator.message('nombre', this.state.per_nombre, 'required|max:50|min:3', { className: 'text-danger' })}
                             </div>
                         </div>
                         <div className="row form-group">
@@ -300,7 +300,7 @@ class Profiles extends Component {
                                     <option value="1">Activo</option>
                                     <option value="0">Inactivo</option>
                                 </select>
-                                {this.validator.message('estado', this.state.per_estado, 'required',  { className: 'text-danger' })}
+                                {this.validator.message('estado', this.state.per_estado, 'required|integer',  { className: 'text-danger' })}
                             </div>  
                         </div>
                         {

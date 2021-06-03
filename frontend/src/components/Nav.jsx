@@ -1,10 +1,11 @@
 import React from 'react'
-import {_Home } from '../config/path'
+import { _Home } from '../config/path'
 
 const Nav = () => {
 
     const Cerrar_sesion = () => {
         window.localStorage.removeItem("authentication", true);
+        window.localStorage.removeItem("usuario", true);
         window.location.href = '/'
     }
 

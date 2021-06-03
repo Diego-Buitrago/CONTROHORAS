@@ -1,5 +1,5 @@
 import {BrowserRouter as Router, Switch} from 'react-router-dom'
-import {_Login, _Home, _Users, _Profiles, _Recover_password, _Horas, _Costos, _Obras} from './config/path'
+import {_Login, _Home, _Users, _Profiles, _Recover_password, _Horas, _Costos, _Obras, _Registro_jornadas} from './config/path'
 import PrivateRoute from './components/PrivateRout'
 import PublicRoute from './components/PublicRout'
 
@@ -12,6 +12,7 @@ import Horas from './pages/Horas'
 import Recover_password from './pages/Recover_password'
 import Costos from './pages/Costos'
 import Obras from './pages/Obras'
+import Registro_jornadas from './pages/Registro_jornadas'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <PrivateRoute path={_Horas} component={Horas}/>
         <PrivateRoute path={_Costos} component={Costos}/>
         <PrivateRoute path={_Obras} component={Obras}/>
+        <PrivateRoute path={_Registro_jornadas} component={Registro_jornadas}/>
       </Switch>
     </Router>
   )

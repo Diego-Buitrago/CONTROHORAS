@@ -8,14 +8,14 @@ const Home = () => {
  
 
     return (
-        <>
+    
+        <div className="col-md-12">
             <Nav/>
             <Menu></Menu>
             {/*UBICAR EL MENU*/}
             <div className="content-wrapper">{/* CONTENIDO DEL MODULO */ }</div>
             <Footer/>
-        </>
-        
+        </div>  
     )
 }
 

@@ -27,7 +27,7 @@ router.post('/enviar_mail', async (req, res) => {
         const [rows, fields] = await cnn_mysql.promise().execute(`SELECT use_id FROM usuarios WHERE use_correo = ?`, [to]);
 
         if (rows == 0) {
-          return res.status(500).json('usuario no encontrado');
+          return res.status(501).json('usuario no encontrado');
         } else {
             const use_id = rows[0].use_id;
 			const random = Math.random() 
@@ -52,7 +52,7 @@ router.post('/enviar_mail', async (req, res) => {
 					'INSERT INTO recuperar(rec_codigo, rec_estado, use_id, rec_email,rec_fecha) VALUES(?,?,?,?,?)',
 					[random, 1, use_id, to, fec ]
 				);
-				exist =  rowsi.affectedRows;
+				
 			}
 				
 				contentHTML = `<!DOCTYPE html>
@@ -100,7 +100,7 @@ router.post('/enviar_mail', async (req, res) => {
 								</tr>
 								<tr>
 									<td>
-										<a href="http://localhost:3000/recover_password?email=${to}&cod=${random}">pulsa aqui para recuperar</a>
+										<a href="http://localhost:3000/recover_password/${to}/${random}">pulsa aqui para recuperar</a>
 									</td>
 								</tr>
 								

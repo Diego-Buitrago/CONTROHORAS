@@ -1,5 +1,5 @@
 import React from 'react'
-import {_Users, _Profiles, _Horas, _Costos, _Obras} from '../config/path'
+import {_Users, _Profiles, _Horas, _Costos, _Obras, _Registro_jornadas} from '../config/path'
 
 const Menu = () => {
 
@@ -50,7 +50,7 @@ const Menu = () => {
                   </ul>
                 </li>
                 <li className="nav-item">
-                  <a href="pages/widgets.html" className="nav-link">
+                  <a href={_Registro_jornadas} className="nav-link">
                     <i className="nav-icon fas fa-th"></i>
                     <p>
                       Registro jornada

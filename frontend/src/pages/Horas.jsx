@@ -8,6 +8,9 @@ import Moment from 'moment';
 SimpleReactValidator.addLocale('custom', {
     accepted: 'Hab SoSlI’ Quch!',
     required: 'El campo :attribute es obligatorio.',
+    max: ':attribute no debe ser mayor a :max:type.',
+    min: 'El tamaño de :attribute debe ser de al menos :min:type.',
+    alpha: ':attribute sólo debe contener letras.'
 });
 
 class Horas extends Component {
@@ -101,6 +104,7 @@ class Horas extends Component {
 
     AbrirModal_nuevo = () => {
         this.setState({modal_nuevo: true})
+        this.Reset_horas()
     }
 
     CerrarModal_nuevo = () => {
@@ -118,7 +122,7 @@ class Horas extends Component {
                 hor_nombre: this.state.hor_nombre,
                 hor_codigo: this.state.hor_codigo,
                 hor_porcentaje: this.state.hor_porcentaje,
-                hor_usu_act: 'Diego',
+                hor_usu_act: localStorage.getItem("usuario"),
                 hor_fecha_act: Moment().format('YYYY-MM-DD HH:mm')
             }),
             }).then((res) => {
@@ -163,7 +167,7 @@ class Horas extends Component {
                 hor_nombre: this.state.hor_nombre,
                 hor_codigo: this.state.hor_codigo,
                 hor_porcentaje: this.state.hor_porcentaje,
-                hor_usu_act: 'Diego',
+                hor_usu_act: localStorage.getItem("usuario"),
                 hor_fecha_act: Moment().format('YYYY-MM-DD HH:mm'),
                 id: this.state.hor_id
             }),
@@ -200,11 +204,20 @@ class Horas extends Component {
         this.setState({
             [e.target.name]: e.target.value
         })
-    } 
+    }
+
+    Reset_horas = () => {
+        this.setState({
+            hor_id: null,
+            hor_nombre: '',
+            hor_codigo: '',
+            hor_porcentaje: ''
+        })
+    }
 
     render () {
         return (
-            <div className="wrapper">
+            <div className="wrapper col-md-12">
                 <Modal
                     title="Crear Hora"
                     visible={this.state.modal_nuevo}
@@ -221,7 +234,7 @@ class Horas extends Component {
                                 name="hor_nombre" 
                                 className="ant-input"
                             />
-                            {this.validator.message('nombre', this.state.hor_nombre, 'required|alpha', { className: 'text-danger' })}
+                            {this.validator.message('nombre', this.state.hor_nombre, 'required|max:50|min:3', { className: 'text-danger' })}
                             </div>
                         </div>
                         <div className="row form-group">
@@ -232,7 +245,7 @@ class Horas extends Component {
                                 name="hor_codigo" 
                                 className="ant-input"
                             />
-                            {this.validator.message('codigo', this.state.hor_codigo, 'required', { className: 'text-danger' })}
+                            {this.validator.message('codigo', this.state.hor_codigo, 'required|numeric|min:0,num|max:10|min:5', { className: 'text-danger' })}
                             </div>
                         </div>
                         <div className="row form-group">
@@ -243,7 +256,7 @@ class Horas extends Component {
                                 name="hor_porcentaje" 
                                 className="ant-input"
                             />
-                            {this.validator.message('porcentaje', this.state.hor_porcentaje, 'required', { className: 'text-danger' })}
+                            {this.validator.message('porcentaje', this.state.hor_porcentaje, 'required|numeric|min:0,num|max:100,num', { className: 'text-danger' })}
                             </div>
                         </div>
                         {
@@ -273,7 +286,7 @@ class Horas extends Component {
                                 name="hor_nombre" 
                                 className="ant-input"
                             />
-                            {this.validator.message('nombre', this.state.hor_nombre, 'required|alpha', { className: 'text-danger' })}
+                            {this.validator.message('nombre', this.state.hor_nombre, 'required|max:50|min:3', { className: 'text-danger' })}
                             </div>
                         </div>
                         <div className="row form-group">
@@ -285,7 +298,7 @@ class Horas extends Component {
                                 name="hor_codigo" 
                                 className="ant-input"
                             />
-                            {this.validator.message('codigo', this.state.hor_codigo, 'required', { className: 'text-danger' })}
+                            {this.validator.message('codigo', this.state.hor_codigo, 'required|numeric|min:0,num|max:10|min:5', { className: 'text-danger' })}
                             </div>
                         </div>
                         <div className="row form-group">
@@ -297,7 +310,7 @@ class Horas extends Component {
                                 name="hor_porcentaje" 
                                 className="ant-input"
                             />
-                            {this.validator.message('porcentaje', this.state.hor_porcentaje, 'required', { className: 'text-danger' })}
+                            {this.validator.message('porcentaje', this.state.hor_porcentaje, 'required|numeric|min:0,num|max:100,num', { className: 'text-danger' })}
                             </div>
                         </div>
                         {

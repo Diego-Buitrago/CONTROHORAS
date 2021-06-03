@@ -82,7 +82,7 @@ router.put('/editar_costo', async(req, res) => {
     }
 });
 
-router.delete('/eliminar_COSTO', async(req, res) => {
+router.delete('/eliminar_costo', async(req, res) => {
     const {id} = req.body
     
     cnn_mysql.query(`DELETE FROM centro_costos WHERE cos_id = ?`, [id], (error, resulset, fields) => {

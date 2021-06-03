@@ -78,6 +78,11 @@ CREATE TABLE recuperar(
     rec_fecha DATETIME(0) 
 );
 
+CREATE TABLE tipo_novedad(
+    nov_id INT(5) PRIMARY KEY AUTO_INCREMENT,
+    nov_nombre VARCHAR(50)
+);
+
 ALTER TABLE recuperar 
 ADD CONSTRAINT `fk_recuperar` 
 FOREIGN KEY (`use_id`) 

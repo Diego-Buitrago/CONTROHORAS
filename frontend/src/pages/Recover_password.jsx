@@ -8,6 +8,7 @@ SimpleReactValidator.addLocale('custom', {
     min: 'El tamaño de :attribute debe ser de al menos :min:type.',
 });
 
+
 class Recuperar extends Component {
 
     validator = new SimpleReactValidator({ locale:'custom'});
@@ -16,8 +17,17 @@ class Recuperar extends Component {
         contrasena: '',
         confi_contrasena: ''
     }
+
+    componentDidMount() {
+      const email = this.props.match.params.email;
+      const cod = this.props.match.params.cod;
+      this.setState({
+  
+      })
+    }
   
     recuperar_contra = async(e) => {
+    
         e.preventDefault();
         if (this.validator.allValid()) {
             fetch("/actulizar_contrasena", {
@@ -27,11 +37,9 @@ class Recuperar extends Component {
             },
                 body: JSON.stringify({
                     use_contrasena: this.state.contrasena,
-                    use_correo: localStorage.getItem("recuperar")
                 }),
             }).then((res) => {
                 if (res.status === 200) {
-                    window.localStorage.removeItem("recuperar", true);
                     window.location.href = '/'
                 } else {
                     this.setState({error: 'Error en el servidor contacta al administrador'})
@@ -110,6 +118,6 @@ class Recuperar extends Component {
           </>    
         );
     }
-}
+} 
   
 export default Recuperar;

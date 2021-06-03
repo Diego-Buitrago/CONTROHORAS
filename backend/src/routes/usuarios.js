@@ -8,10 +8,10 @@ router.post('/inicio_sesion', async(req, res) => {
     const { use_correo, use_contrasena} = req.body;
     
     try {
-        const [rows, fields] = await cnn_mysql.promise().execute(`SELECT use_contrasena FROM usuarios WHERE use_correo = ?`, [use_correo]);
+        const [rows, fields] = await cnn_mysql.promise().execute(`SELECT use_contrasena, use_nombre, use_apellido FROM usuarios WHERE use_correo = ?`, [use_correo]);
 
         if (rows == 0) {
-          return res.json('usuario no encontrado verifica datos');
+          return res.json('contraseña invalida');
         } else {
             
             const matchPassword = await bcrypt.compare(use_contrasena, rows[0].use_contrasena);
@@ -25,6 +25,22 @@ router.post('/inicio_sesion', async(req, res) => {
     } catch (error) {
       console.log(error);
     }
+});
+
+router.get('/verificar_codigo', async(req, res) => {
+  const { codigo, correo } = req.query;
+
+  try {
+    const [rows, fields] = await cnn_mysql.promise().execute(`SELECT * FROM recuperar WHERE rec_codigo = ? AND rec_email = ?`, [codigo, correo]);
+    if (rows == 0) {
+      return res.json('codigo no encontrado');
+    } else {
+        return res.json(rows);
+    }
+} catch (error) {
+  console.log(error);
+}
+      
 });
 
 router.put('/actulizar_contrasena', async(req, res) => {

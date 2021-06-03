@@ -20,7 +20,8 @@ SimpleReactValidator.addLocale('custom', {
     required: 'El campo :attribute es obligatorio.',
     max: ':attribute no debe ser mayor a :max:type.',
     min: 'El tamaño de :attribute debe ser de al menos :min:type.',
-    alpha: ':attribute sólo debe contener letras.'
+    alpha: ':attribute sólo debe contener letras.',
+    date: ':attribute debe ser una fecha valida'
     
 });
 
@@ -100,7 +101,9 @@ class Usuarios extends Component {
     }
 
     async componentDidMount() {
-        fetch("/usuarios", {
+
+        this.Buscar();
+        /* fetch("/usuarios", {
             method: "POST",
             headers: {
             "Content-Type": "application/json",
@@ -113,7 +116,6 @@ class Usuarios extends Component {
         })
         .then(response => response.json())
         .then(data => {
-            console.info(data)
            const array = []
             if (data !== 'usuario no encontrado verifica datos') {
                 data.map(item =>
@@ -123,11 +125,11 @@ class Usuarios extends Component {
                         apellido: item.use_apellido,
                         documento: item.use_documento, 
                         correo: item.use_correo,
-                        fecha_ingreso: item.use_fecha_ingreso?item.use_fecha_ingreso.slice(0, -14):'',
+                        fecha_ingreso: item.use_fecha_ingreso,
                         salario: item.use_salario_basico,
                         perfil: item.per_nombre,
                         use_usu_act: item.use_usu_act,
-                        use_fecha_act: item.use_fecha_act ? item.use_fecha_act.slice(0, -14) : '',
+                        use_fecha_act: item.use_fecha_act,
                         editar: (<button
                                 onClick={() => {this.Editar(item.use_id)}}
                                 className="btn btn-primary"
@@ -144,7 +146,7 @@ class Usuarios extends Component {
                 )
             }
             this.setState({datos: array})
-        });
+        }); */
         const res = await fetch(`/perfiles_activos`)
         const data = await res.json()
         this.setState({perfiles :data})
@@ -226,7 +228,7 @@ class Usuarios extends Component {
                         use_firma: 'urlejemplo',
                         use_contrasena: this.state.use_contrasena,
                         per_id: this.state.per_id,
-                        use_usu_act: 'Diego',
+                        use_usu_act: localStorage.getItem("usuario"),
                         use_fecha_act: Moment().format('YYYY-MM-DD HH:mm')
                 }),
                 }).then((res) => {
@@ -241,7 +243,6 @@ class Usuarios extends Component {
                         this.setState({error: 'Error en el servidor contacta al administrador'})
                     }
                 }); 
-            
         } else {
            
             this.validator.showMessages();
@@ -261,6 +262,7 @@ class Usuarios extends Component {
             use_documento: data[0].use_documento,
             use_correo: data[0].use_correo,
             use_salario: data[0].use_salario_basico,
+            use_fecha_ingreso: data[0].use_fecha_ingreso,
             per_id: data[0].per_id,
             use_id: id          
         })
@@ -286,7 +288,7 @@ class Usuarios extends Component {
                     use_salario: this.state.use_salario,
                     use_firma: 'urlejemplo',
                     per_id: this.state.per_id,
-                    use_usu_act: 'Diego',
+                    use_usu_act: localStorage.getItem("usuario"),
                     use_fecha_act: Moment().format('YYYY-MM-DD HH:mm'),
                     id: this.state.use_id
                 }),
@@ -359,7 +361,7 @@ class Usuarios extends Component {
                             name="use_nombre" 
                             className="ant-input"
                         />
-                        {this.validator.message('nombre', this.state.use_nombre, 'required|alpha|min:4', { className: 'text-danger' })}
+                        {this.validator.message('nombre', this.state.use_nombre, 'required|max:50|min:3', { className: 'text-danger' })}
                         </div>
                     </div>
                     <div className="row form-group">
@@ -370,7 +372,7 @@ class Usuarios extends Component {
                             name="use_apellido" 
                             className="ant-input"
                         />
-                        {this.validator.message('apellido', this.state.use_apellido, 'required|alpha|min:4', { className: 'text-danger' })}
+                        {this.validator.message('apellido', this.state.use_apellido, 'required|max:50|min:3', { className: 'text-danger' })}
                         </div>       
                     </div>
                     <div className="row form-group">
@@ -381,7 +383,7 @@ class Usuarios extends Component {
                             name="use_documento"
                             className="ant-input"
                         />
-                        {this.validator.message('documento', this.state.use_documento, 'required|min:6|max:10', { className: 'text-danger' })}
+                        {this.validator.message('documento', this.state.use_documento, 'required|max:15|min:5', { className: 'text-danger' })}
                         </div>       
                     </div>
                     <div className="row form-group">
@@ -403,7 +405,7 @@ class Usuarios extends Component {
                             name="use_fecha_ingreso"
                             className="ant-input"
                         />
-                        {this.validator.message('fecha de ingreso', this.state.use_fecha_ingreso, 'required', { className: 'text-danger' })}
+                        {this.validator.message('fecha de ingreso', this.state.use_fecha_ingreso, 'required|date', { className: 'text-danger' })}
                         </div>       
                     </div>
                     <div className="row form-group">
@@ -414,7 +416,7 @@ class Usuarios extends Component {
                             name="use_salario"
                             className="ant-input"
                         />
-                        {this.validator.message('salario básico', this.state.use_salario, 'required', { className: 'text-danger' })}
+                        {this.validator.message('salario básico', this.state.use_salario, 'required|numeric', { className: 'text-danger' })}
                         </div>       
                     </div>
                     {/* <div className="row form-group">
@@ -460,7 +462,7 @@ class Usuarios extends Component {
                                     )
                                 }
                             </select>
-                            {this.validator.message('tipo usuario', this.state.per_id, 'required', { className: 'text-danger' })}
+                            {this.validator.message('tipo usuario', this.state.per_id, 'required|integer', { className: 'text-danger' })}
                         </div>       
                     </div>
                     {
@@ -490,7 +492,7 @@ class Usuarios extends Component {
                             name="use_nombre" 
                             className="ant-input"
                         />
-                         {this.validatorEdi.message('nombre', this.state.use_nombre, 'required|alpha|min:4', { className: 'text-danger' })}
+                         {this.validatorEdi.message('nombre', this.state.use_nombre, 'required|max:50|min:3', { className: 'text-danger' })}
                         </div>
                     </div>
                     <div className="row form-group">
@@ -502,7 +504,7 @@ class Usuarios extends Component {
                             name="use_apellido" 
                             className="ant-input"
                         />
-                         {this.validator.message('apellido', this.state.use_apellido, 'required|alpha|min:4', { className: 'text-danger' })}
+                         {this.validator.message('apellido', this.state.use_apellido, 'required|max:50|min:3', { className: 'text-danger' })}
                         </div>       
                     </div>
                     <div className="row form-group">
@@ -514,7 +516,7 @@ class Usuarios extends Component {
                             name="use_documento"
                             className="ant-input"
                         />
-                        {this.validatorEdi.message('documento', this.state.use_documento, 'required|min:6|max:10', { className: 'text-danger' })}
+                        {this.validatorEdi.message('documento', this.state.use_documento, 'required|max:15|min:5', { className: 'text-danger' })}
                         </div>       
                     </div>
                     <div className="row form-group">
@@ -538,7 +540,7 @@ class Usuarios extends Component {
                             name="use_fecha_ingreso"
                             className="ant-input"
                         />
-                        {this.validator.message('fecha de ingreso', this.state.use_fecha_ingreso, 'required', { className: 'text-danger' })}
+                        {this.validator.message('fecha de ingreso', this.state.use_fecha_ingreso, 'required|date', { className: 'text-danger' })}
                         </div>       
                     </div>
                     <div className="row form-group">
@@ -550,7 +552,7 @@ class Usuarios extends Component {
                             name="use_salario"
                             className="ant-input"
                         />
-                        {this.validator.message('salario básico', this.state.use_salario, 'required', { className: 'text-danger' })}
+                        {this.validator.message('salario básico', this.state.use_salario, 'required|numeric', { className: 'text-danger' })}
                         </div>       
                     </div>
                     {/* <div className="row form-group">
@@ -575,8 +577,9 @@ class Usuarios extends Component {
                                     )
                                 }
                             </select>
-                            {this.validatorEdi.message('tipo usuario', this.state.per_id, 'required', { className: 'text-danger' })}
-                        </div>       
+                            {this.validatorEdi.message('tipo usuario', this.state.per_id, 'required|integer', { className: 'text-danger' })}
+                        </div> 
+                              
                     </div>
                     {
                         this.state.error != null ? (
