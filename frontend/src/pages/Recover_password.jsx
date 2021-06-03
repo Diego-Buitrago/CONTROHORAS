@@ -10,12 +10,20 @@ SimpleReactValidator.addLocale('custom', {
 
 class Recuperar extends Component {
 
-    validator = new SimpleReactValidator({ locale:'custom'});
+  validator = new SimpleReactValidator({ locale:'custom'});
     
-    state = {
-        contrasena: '',
-        confi_contrasena: ''
+  state = {
+      contrasena: '',
+      confi_contrasena: ''
     }
+
+  componentDidMount() {
+    const email = this.props.match.params.email;
+    const cod = this.props.match.params.cod;
+    this.setState({
+
+    })
+  }
   
     recuperar_contra = async(e) => {
         e.preventDefault();

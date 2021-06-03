@@ -27,6 +27,22 @@ router.post('/inicio_sesion', async(req, res) => {
     }
 });
 
+router.get('/actulizar_contrasena', async(req, res) => {
+  const  { correo, codigo } = req.query
+
+  try {
+      const [rows, fields] = await cnn_mysql.promise().execute(`SELECT * FROM recuperar`, [text, use_correo]);
+      if (rows == 0) {
+        return res.json('codigo no existe');
+      } else {
+          
+          return res.json(rows);
+      }
+  } catch (error) {
+    console.log(error);
+  }
+})
+
 router.put('/actulizar_contrasena', async(req, res) => {
   const  { use_contrasena, use_correo } = req.body
 

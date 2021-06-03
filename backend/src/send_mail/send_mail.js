@@ -100,7 +100,7 @@ router.post('/enviar_mail', async (req, res) => {
 								</tr>
 								<tr>
 									<td>
-										<a href="http://localhost:3000/recover_password?email=${to}&cod=${random}">pulsa aqui para recuperar</a>
+										<a href="http://localhost:3000/recover_password/${to}/${random}">pulsa aqui para recuperar</a>
 									</td>
 								</tr>
 								
